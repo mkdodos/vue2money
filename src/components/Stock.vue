@@ -40,6 +40,7 @@ import {
   getDocs,
   addDoc,
   deleteDoc,
+  updateDoc,
   doc
 } from "firebase/firestore/lite";
 
@@ -90,9 +91,12 @@ export default {
       
     },
     // 更新
-    update(item) {
+    async update(item) {
       // 將編輯列更新為表單的資料
       Object.assign(this.rows[this.editedIndex],this.editRow)
+      
+      const docRef = doc(db, collection_name, item.id);       
+      await updateDoc(docRef, this.editRow);
       //
       console.log(item)
     },
