@@ -1,11 +1,16 @@
 <template>
   <div>
     <v-container>
+    
       <v-dialog v-model="dialog" width="500">
         <v-card>
           <v-card-title class="text-h5 grey lighten-2">股票編輯</v-card-title>
           <v-card-text>
             <v-row>
+              <v-col>
+                <!-- <v-text-field label="日期" v-model="editRow.date" type="date"></v-text-field> -->
+              </v-col>
+
               <v-col>
                 <v-text-field label="名稱" v-model="editRow.stockName"></v-text-field>
               </v-col>
@@ -22,7 +27,8 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="dialog = false">關閉</v-btn>
+            <!-- <v-btn color="primary" text @click="dialog = false">取消</v-btn> -->
+            <v-btn color="primary" text @click="cancel">取消</v-btn>
             <v-btn color="green" class="white--text" @click="save">儲存</v-btn>
           </v-card-actions>
         </v-card>
@@ -40,6 +46,7 @@
         </v-row>
       </v-form>
       <v-data-table :headers="headers" :items="rows">
+        <!-- <template v-slot:item.date="{item}">{{item.date.toDate().toISOString().slice(0, 10)}}</template> -->
         <template v-slot:item.type="{item}">
           <v-chip dark :color="getTypeColor(item)">{{ getType(item) }}</v-chip>
         </template>
@@ -62,7 +69,8 @@ import {
   addDoc,
   deleteDoc,
   updateDoc,
-  doc
+  doc,
+  // Timestamp
 } from "firebase/firestore/lite";
 
 import db from "../db.js";
@@ -74,9 +82,13 @@ export default {
     return {
       dialog: false,
       rows: [], //資料
-      editRow: {}, //編輯列
+      editRow: {
+        // 2022-03-16 配合日期輸入框可用格式 yyyy-mm-dd
+        // date: new Date().toISOString().slice(0, 10)
+      }, //編輯列
       headers: [
         { text: "", value: "del" },
+        // { text: "日期", value: "date" },
         { text: "交易類別", value: "type" },
         { text: "名稱", value: "stockName" },
         { text: "股數", value: "qty" },
@@ -88,15 +100,7 @@ export default {
     };
   },
   created() {
-    this.getMoney();
-    // console.log(this.rows)
-    // this.rows.forEach(row=>{
-    //   console.log(row)
-    // })
-    // let sum = 0;
-    // this.rows.reduce(
-    //   (prev,curr)=>console.log(prev+curr)
-    //   )
+    this.getMoney(); 
   },
   computed: {
     total() {
@@ -108,6 +112,12 @@ export default {
     }
   },
   methods: {
+    // 編輯取消 
+    cancel() {
+      this.dialog = false;
+      this.editRow = {};
+      this.editedIndex = -1;
+    },
     // 交易類別文字
     getType(item) {
       if (item.qty > 0) {
@@ -128,11 +138,17 @@ export default {
     },
     // 編輯
     edit(item) {
+      // console.log(item.date);
       this.editedIndex = this.rows.indexOf(item);
+  console.log(this.editedIndex)
       // 選取列 item 設定給編輯列
       this.editRow = Object.assign({}, item);
+      // 轉成日期輸入框可接受格式
+      // this.editRow.date = this.editRow.date
+      //   .toDate()
+      //   .toISOString()
+      //   .slice(0, 10);
       this.dialog = true;
-      // console.log(item);
     },
     // 儲存
     save() {
@@ -140,9 +156,7 @@ export default {
       if (this.editedIndex > -1) {
         this.update(this.editRow);
         // console.log("edit")
-        // 將表單清空
-        this.editRow = {};
-        this.editedIndex = -1;
+        
       } else {
         this.create();
         // console.log("create")
@@ -152,12 +166,26 @@ export default {
     // 更新
     async update(item) {
       // 將編輯列更新為表單的資料
-      Object.assign(this.rows[this.editedIndex], this.editRow);
 
+      // this.editRow.date = Timestamp.fromDate(new Date(this.editRow.date));
       const docRef = doc(db, collection_name, item.id);
-      await updateDoc(docRef, this.editRow);
+      await updateDoc(docRef, item);
+      // console.log(this.editedIndex)
+      Object.assign(this.rows[this.editedIndex], item);
+
+      //下列程式若沒放在 nextTick 會出現 Cannot convert undefined or null to object at Function.assign
+      //可能是因為 editedIndex 先被設成 -1 導致 assign 出問題 
+      this.$nextTick(() => {
+        // 將表單清空
+        this.editRow = {};        
+        this.editedIndex = -1;
+      })
+      
+     
+
       //
-      console.log(item);
+
+      // console.log(this.editRow);
     },
     // 刪除
     async destory(item) {
