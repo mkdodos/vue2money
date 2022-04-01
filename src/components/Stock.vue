@@ -1,8 +1,14 @@
 <template>
   <div>
     <v-container>
-      <v-form>
-        <v-row>
+      <v-dialog v-model="dialog" width="500">
+
+
+
+  <v-card>    
+    <v-card-title class="text-h5 grey lighten-2">股票編輯</v-card-title>
+    <v-card-text>
+         <v-row>
           <v-col>
             <v-text-field label="名稱" v-model="editRow.stockName"></v-text-field>
           </v-col>
@@ -13,10 +19,30 @@
             <v-text-field label="單價" v-model="editRow.price" type="number"></v-text-field>
           </v-col>
         </v-row>
+    </v-card-text>
+    
+    <v-divider></v-divider>
+    
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="primary" text @click="dialog = false">關閉</v-btn>
+      <v-btn color="green" class="white--text" @click="save">儲存</v-btn>
+    </v-card-actions>
+    
+  </v-card>
+
+
+     
+      </v-dialog>
+      <v-form>
+        
 
         <v-row class="mb-6">
           <v-col class="text-right">
-            <v-btn color="green" class="white--text" @click="save">儲存</v-btn>
+            <v-btn color="green" class="white--text" @click="openDialog">新增</v-btn>
+          </v-col>
+          <v-col class="text-right">
+            
           </v-col>
         </v-row>
       </v-form>
@@ -50,7 +76,8 @@ const collection_name = "stocks";
 
 export default {
   data() {
-    return {     
+    return {    
+      dialog: false, 
       rows: [],//資料     
       editRow:{},//編輯列
       headers: [
@@ -68,12 +95,17 @@ export default {
     this.getMoney();
   },
   methods: {
+    // 開啟編輯視窗
+    openDialog() {
+      this.dialog = true
+    },
     // 編輯
     edit(item) {
       this.editedIndex = this.rows.indexOf(item);
       // 選取列 item 設定給編輯列
       this.editRow = Object.assign({},item)
-      console.log(item);
+      this.dialog = true
+      // console.log(item);
     },
     // 儲存
     save() {
@@ -88,6 +120,7 @@ export default {
         this.create()
         // console.log("create")
       }
+      this.dialog = false;
       
     },
     // 更新
