@@ -1,14 +1,13 @@
 <template>
   <div>
     <v-container>
-    
       <v-dialog v-model="dialog" width="500">
         <v-card>
           <v-card-title class="text-h5 grey lighten-2">股票編輯</v-card-title>
           <v-card-text>
             <v-row>
               <v-col>
-                <!-- <v-text-field label="日期" v-model="editRow.date" type="date"></v-text-field> -->
+                <v-text-field label="日期" v-model="editRow.date" type="date"></v-text-field>
               </v-col>
 
               <v-col>
@@ -46,7 +45,7 @@
         </v-row>
       </v-form>
       <v-data-table :headers="headers" :items="rows">
-        <!-- <template v-slot:item.date="{item}">{{item.date.toDate().toISOString().slice(0, 10)}}</template> -->
+        <template v-slot:item.date="{item}">{{item.date.toDate().toISOString().slice(0, 10)}}</template>
         <template v-slot:item.type="{item}">
           <v-chip dark :color="getTypeColor(item)">{{ getType(item) }}</v-chip>
         </template>
@@ -70,7 +69,7 @@ import {
   deleteDoc,
   updateDoc,
   doc,
-  // Timestamp
+  Timestamp
 } from "firebase/firestore/lite";
 
 import db from "../db.js";
@@ -84,11 +83,11 @@ export default {
       rows: [], //資料
       editRow: {
         // 2022-03-16 配合日期輸入框可用格式 yyyy-mm-dd
-        // date: new Date().toISOString().slice(0, 10)
+        date: new Date().toISOString().slice(0, 10)
       }, //編輯列
       headers: [
         { text: "", value: "del" },
-        // { text: "日期", value: "date" },
+        { text: "日期", value: "date" },
         { text: "交易類別", value: "type" },
         { text: "名稱", value: "stockName" },
         { text: "股數", value: "qty" },
@@ -100,7 +99,7 @@ export default {
     };
   },
   created() {
-    this.getMoney(); 
+    this.getMoney();
   },
   computed: {
     total() {
@@ -112,7 +111,7 @@ export default {
     }
   },
   methods: {
-    // 編輯取消 
+    // 編輯取消
     cancel() {
       this.dialog = false;
       this.editRow = {};
@@ -140,14 +139,14 @@ export default {
     edit(item) {
       // console.log(item.date);
       this.editedIndex = this.rows.indexOf(item);
-  console.log(this.editedIndex)
+      console.log(this.editedIndex);
       // 選取列 item 設定給編輯列
       this.editRow = Object.assign({}, item);
       // 轉成日期輸入框可接受格式
-      // this.editRow.date = this.editRow.date
-      //   .toDate()
-      //   .toISOString()
-      //   .slice(0, 10);
+      this.editRow.date = this.editRow.date
+        .toDate()
+        .toISOString()
+        .slice(0, 10);
       this.dialog = true;
     },
     // 儲存
@@ -155,37 +154,53 @@ export default {
       // 判斷 editedIndex -1 為 新增
       if (this.editedIndex > -1) {
         this.update(this.editRow);
-        // console.log("edit")
-        
+        // this.editedIndex = -1;
+        //  Uncaught (in promise) TypeError:
+        //  Cannot convert undefined or null to object at Function.assign
+        //  如果放在這邊會出問題
+        //  因為 update 函數設成是 async 非同步,在還沒處理完Object.assign(this.rows[this.editedIndex], item)
+        //  就先跑 editedIndex 設為 -1 導致錯誤
       } else {
         this.create();
         // console.log("create")
       }
-      this.dialog = false;
+    },
+    // 新增
+    async create() {
+      // console.log(Timestamp.fromDate(new Date(this.editRow.date)))
+      let newDate = Timestamp.fromDate(new Date(this.editRow.date)) 
+      await addDoc(collection(db, "stocks"), {
+        date: newDate,
+        // date: new Date(),
+        stockName: this.editRow.stockName,
+        qty: this.editRow.qty,
+        price: this.editRow.price
+      }).then(doc => {
+        // 新增完,取得 ID ,才可立即做刪除
+        this.editRow.id = doc.id;
+        this.dialog = false;
+        this.editRow.date = newDate
+        this.rows.unshift(this.editRow);
+        this.editRow = {};
+        this.editRow.date = new Date().toISOString().slice(0, 10)
+        // Object.assign(this.row,{})
+        console.log(doc.id);
+      });
     },
     // 更新
     async update(item) {
       // 將編輯列更新為表單的資料
 
       // this.editRow.date = Timestamp.fromDate(new Date(this.editRow.date));
+
+      item.date = Timestamp.fromDate(new Date(item.date));
       const docRef = doc(db, collection_name, item.id);
       await updateDoc(docRef, item);
       // console.log(this.editedIndex)
       Object.assign(this.rows[this.editedIndex], item);
-
-      //下列程式若沒放在 nextTick 會出現 Cannot convert undefined or null to object at Function.assign
-      //可能是因為 editedIndex 先被設成 -1 導致 assign 出問題 
-      this.$nextTick(() => {
-        // 將表單清空
-        this.editRow = {};        
-        this.editedIndex = -1;
-      })
-      
-     
-
-      //
-
-      // console.log(this.editRow);
+      this.dialog = false;
+      this.editRow = {};
+      this.editedIndex = -1;
     },
     // 刪除
     async destory(item) {
@@ -208,22 +223,7 @@ export default {
         // console.log(row);
       });
     },
-    // 新增
-    async create() {
-      await addDoc(collection(db, "stocks"), {
-        date: new Date(),
-        stockName: this.editRow.stockName,
-        qty: this.editRow.qty,
-        price: this.editRow.price
-      }).then(doc => {
-        // 新增完,取得 ID ,才可立即做刪除
-        this.editRow.id = doc.id;
-        this.rows.unshift(this.editRow);
-        this.editRow = {};
-        // Object.assign(this.row,{})
-        console.log(doc.id);
-      });
-    }
+    
   }
 };
 </script>
