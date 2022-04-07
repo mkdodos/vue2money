@@ -11,6 +11,7 @@
               </v-col>
 
               <v-col>
+                
                 <v-text-field label="名稱" v-model="editRow.stockName"></v-text-field>
               </v-col>
               <v-col>
@@ -46,6 +47,10 @@
       </v-form>
       <v-data-table :headers="headers" :items="rows">
         <template v-slot:item.date="{item}">{{item.date.toDate().toISOString().slice(0, 10)}}</template>
+        <template v-slot:item.stockName="{item}">
+          <!-- <router-link to="/stock-transaction">{{item.stockName}}</router-link> -->
+          <router-link :to="{name:'StockTransaction',params:{id:item.id}}">{{item.stockName}}</router-link>
+        </template>
         <template v-slot:item.type="{item}">
           <v-chip dark :color="getTypeColor(item)">{{ getType(item) }}</v-chip>
         </template>
@@ -170,8 +175,7 @@ export default {
       // console.log(Timestamp.fromDate(new Date(this.editRow.date)))
       let newDate = Timestamp.fromDate(new Date(this.editRow.date)) 
       await addDoc(collection(db, "stocks"), {
-        date: newDate,
-        // date: new Date(),
+        date: newDate,        
         stockName: this.editRow.stockName,
         qty: this.editRow.qty,
         price: this.editRow.price

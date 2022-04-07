@@ -38,19 +38,21 @@
     </v-app-bar>
 
     <v-main>
-      <Stock/>
+      <!-- <Stock/> -->
+      <router-view></router-view>
+
     </v-main>
   </v-app>
 </template>
 
 <script>
 // import HelloWorld from './components/HelloWorld';
-import Stock from './components/Stock';
+// import Stock from './components/Stock';
 export default {
   name: 'App',
 
   components: {
-    Stock,
+    // Stock,
   },
 
   data: () => ({
