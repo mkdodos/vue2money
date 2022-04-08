@@ -13,10 +13,12 @@ Vue.use(VueRouter)
 
 
 const router = new VueRouter({
-  routes: [
-    
+  mode: 'history',
+  routes: [    
     { name:'Stock', path:'/stock', component:Stock },
     { name:'StockTransaction', path:'/stock-transaction/:id', component:StockTransaction },
+    { name:'StockTransactionAll', path:'/stock-transaction', component:StockTransaction },
+
   ]
 })
 
