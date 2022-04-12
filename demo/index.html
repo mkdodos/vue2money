@@ -11,6 +11,7 @@
 <body>
     <canvas id="myChart" width="200" height="200"></canvas>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
     <script>
         const ctx = document.getElementById('myChart').getContext('2d');
@@ -45,7 +46,12 @@
                         borderWidth: 1
                     }
                 ]
-            }
+            },
+            options: {
+                // 條寬
+                barPercentage: 0.5,
+            },
+            plugins: [ChartDataLabels]
         })
     </script>
 
