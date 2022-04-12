@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chart.js demo</title>
+</head>
+
+<body>
+    <canvas id="myChart" width="200" height="200"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+        // const labels = Utils.months({count: 7});
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                // labels: labels,
+                labels: ['1月', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                    label: '# of Votes',
+                    // x:欄名 , y:數值
+                    // data: [{x:'收入', y:20}, {x:'支出', y:10}],
+                    data: [{ id: 'Sales', nested: { value: 1500 } }, { id: 'Purchases', nested: { value: 500 } }],
+                    // data: [12, 19, 23, 5, 2, 3],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                //配合資料指定不同的 x y 鍵值
+                parsing: {
+                    xAxisKey: 'id',
+                    yAxisKey: 'nested.value'
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    },
+                },
+                // 橫向顯示
+                // indexAxis: 'y',
+                // 條寬
+                barPercentage: 0.5,
+            },
+
+        });
+        // myChart.defaults.elements.bar.borderWidth = 2
+    </script>
+</body>
+
+</html>

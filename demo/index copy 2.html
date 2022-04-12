@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chart.js demo</title>
+</head>
+
+<body>
+    <canvas id="myChart" width="200" height="200"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const bgcolor = [                       
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ]
+        const borderColor =   [
+                       
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ]            
+        // 字型大小
+        Chart.defaults.font.size = 16;
+        const data = [{ x: 'Jan', net: 100, cogs: 50, gm: 50 }, { x: 'Feb', net: 120, cogs: 55, gm: 75 }];
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb'],
+                datasets: [{
+                    label: '1月份net',
+                    data: data,
+                    parsing: {
+                        yAxisKey: 'net'
+                    },
+
+                    backgroundColor: bgcolor,
+                    borderColor: borderColor,
+                    borderWidth: 1
+
+                }, {
+                    label: 'Cost of goods sold',
+                    data: data,
+                    parsing: {
+                        yAxisKey: 'cogs'
+                    },
+                    backgroundColor: bgcolor,
+                    borderColor: borderColor,
+                    borderWidth: 1
+                }, {
+                    label: 'Gross margin',
+                    data: data,
+                    parsing: {
+                        yAxisKey: 'gm'
+                    },
+                    backgroundColor: bgcolor,
+                    borderColor: borderColor,
+                    borderWidth: 1
+                }],
+
+            },
+            options: {
+                //圖表和頁面邊界的距離
+                layout: {
+                    padding: {
+                        top:100,
+                        left:100,
+                        right:100,
+                        bottom:500
+                    }
+                },
+                plugins: {
+                    // 游標移到圖型的時候,出現數值內容
+                    tooltip:{
+                        // enabled:false
+                    },
+                    // 圖例說明
+                    legend: {
+                        // display: false,
+                        position: 'top',
+                        labels: {
+                            // color: 'rgb(255, 99, 132)'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    },
+                },
+                // 橫向顯示
+                // indexAxis: 'y',
+                // 條寬
+                barPercentage: 0.5,
+            },
+
+        });
+        // myChart.defaults.elements.bar.borderWidth = 2
+    </script>
+</body>
+
+</html>
