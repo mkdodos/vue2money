@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chart</title>
+</head>
+
+<body>
+    <canvas id="myChart" width="200" height="200"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+    <script>
+
+
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+
+        function generateRandomIntegerInRange(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // let value5 = generateRandomIntegerInRange(60, 100);
+
+        // console.log(value5);
+
+        let data = [];
+        let num = getRandomInt(100)
+        for (i = 0; i < 5; i++) {
+            // data.push(generateRandomIntegerInRange(60, 100))
+            data.push(20)
+        }
+        console.log(num)
+        // data[0] = getRandomInt(100);
+        // data[1] = getRandomInt(100);
+        // data[2] = getRandomInt(100);
+        // data[3] = getRandomInt(100);
+        // data[4] = getRandomInt(100);
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const bgcolor = [
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(255, 159, 64, 0.2)'
+        ]
+        const borderColor = [
+
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+        ]
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['愷軒', '崇恩', '庭瑋', '庭瑜', '韋瑄'],
+                datasets: [
+                    //第一組    
+                    {
+                        // label: '英文聽力',
+                        data: data,
+                        backgroundColor: bgcolor,
+                        borderColor: borderColor,
+                        borderWidth: 1
+                    },
+
+                ]
+            },
+            
+            options: {
+                // 條寬
+                barPercentage: 0.5,
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 50,
+                    }
+                },
+                plugins: {
+                   
+                   // 圖例說明
+                   legend: {
+                       display: false,
+                       position: 'top',
+                       labels: {
+                           // color: 'rgb(255, 99, 132)'
+                       }
+                   }
+               },
+            },
+            // plugins: [ChartDataLabels]
+        })
+    </script>
+
+</body>
+
+</html>
