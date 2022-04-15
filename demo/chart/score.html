@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Chart Firebase</title>
+</head>
+
+<body>
+    <div id="app">
+        <div v-for="row in rows">
+            <span @click="destory(row.id)">{{ row.id }}</span>
+        </div>
+        <!-- {{ rows }} -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+    <script type="module">
+
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+        import {
+            getFirestore, collection,
+            addDoc,
+            deleteDoc,
+            doc, getDocs
+        } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyClLeHQJMt3BzbrK_AHpWeq0nlqzY2r5ik",
+            authDomain: "money-39797.firebaseapp.com",
+            projectId: "money-39797",
+            storageBucket: "money-39797.appspot.com",
+            messagingSenderId: "142963352306",
+            appId: "1:142963352306:web:ac3c09e593009a5175666b",
+            measurementId: "G-012VKYDZ07"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let rows = [];
+
+
+        const col = collection(db, "scores");
+
+        const snapshot = await getDocs(col);
+        const docs = snapshot.docs;
+
+        docs.forEach(doc => {
+            let row = doc.data() //1筆資料(不含id)
+            row.id = doc.id //加入id    
+            rows.push(row)
+        });
+
+        // rows = docs.map(doc => doc.data());
+
+
+
+        console.log(rows)
+        new Vue({
+            el: '#app',
+            data: {
+                rows: []
+            },
+            mounted() {
+                this.rows = rows
+            },
+            methods: {
+                deleteRow(id) {
+                    console.log(id)
+                },
+                async destory(id) {
+                    await deleteDoc(doc(db, "scores", id));
+                },
+            }
+        })
+    </script>
+</body>
+
+</html>
