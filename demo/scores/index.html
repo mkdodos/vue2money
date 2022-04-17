@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>分數</title>
+</head>
+
+<body>
+
+    <div id="app">
+        <div class="container">
+            <form class="form-inline">       
+                <div class="search"><input type="text" placeholder="姓名" v-model="editedItem.name" /></div>
+                <div class="search"><input type="text" placeholder="分數" v-model="editedItem.score" /></div>
+                <button class="add-btn" @click.prevent="addRow()">新增</button>
+            </form>
+
+
+
+           
+            <div id="list">
+                <div v-for="row in rows" class="delete-btn" @click="destory(row)"> {{ row.name }} {{ row.score }} </div>
+            </div>
+        </div>
+        <!-- {{ rows }} -->
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+    <script type="module">
+        import rows from './db.js';
+        new Vue({
+            el: '#app',
+            data: {
+                rows: [],
+                editedItem: {},
+                editedIndex: -1
+            },
+            mounted() {
+                this.rows = rows
+            },
+            methods: {
+                async addRow() {
+    
+                    await addDoc(collection(db, "scores"), this.editedItem).then((doc) => {
+                        this.editedItem.id = doc.id
+                        this.rows.push(this.editedItem)
+                        this.editedItem = {}
+                    });
+    
+                },
+                async destory(item) {
+                    this.editedIndex = this.rows.indexOf(item);
+                    await deleteDoc(doc(db, "scores", item.id)).then(() => {
+    
+                        this.rows.splice(this.editedIndex, 1);
+                    })
+    
+                },
+            }
+        })
+    
+    
+    
+    </script>
+
+</body>
+
+</html>
+
