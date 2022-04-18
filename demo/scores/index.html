@@ -13,7 +13,7 @@
 
     <div id="app">
         <div class="container">
-            <form class="form-inline">       
+            <form class="form-inline">
                 <div class="search"><input type="text" placeholder="姓名" v-model="editedItem.name" /></div>
                 <div class="search"><input type="text" placeholder="分數" v-model="editedItem.score" /></div>
                 <button class="add-btn" @click.prevent="addRow()">新增</button>
@@ -21,20 +21,42 @@
 
 
 
-           
+
             <div id="list">
                 <div v-for="row in rows" class="delete-btn" @click="destory(row)"> {{ row.name }} {{ row.score }} </div>
             </div>
         </div>
         <!-- {{ rows }} -->
-    </div>
 
+    </div>
+    <canvas id="myChart" width="200" height="200"></canvas>
 
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+    <script>
+        // const ctx = document.getElementById('myChart').getContext('2d');
+
+    </script>
 
     <script type="module">
-        import rows from './db.js';
+        import {
+            getFirestore, collection,
+            addDoc,
+            deleteDoc,
+            doc, getDocs
+        } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore.js";
+        import {db,rows} from './db.js';
+        import myChart from './chart.js';
+        //  rows 陣列每一筆是 json 包含多個欄位值 , 用 map 作一個只有分數的新陣列
+        let arr = rows.map((row) => row.score)
+        let arrLabel = rows.map((row) => row.name)
+        myChart.data.datasets[0].data = arr
+        myChart.data.labels = arrLabel
+        myChart.update();
+
         new Vue({
             el: '#app',
             data: {
@@ -47,30 +69,29 @@
             },
             methods: {
                 async addRow() {
-    
+
                     await addDoc(collection(db, "scores"), this.editedItem).then((doc) => {
                         this.editedItem.id = doc.id
                         this.rows.push(this.editedItem)
                         this.editedItem = {}
                     });
-    
+
                 },
                 async destory(item) {
                     this.editedIndex = this.rows.indexOf(item);
                     await deleteDoc(doc(db, "scores", item.id)).then(() => {
-    
+
                         this.rows.splice(this.editedIndex, 1);
                     })
-    
+
                 },
             }
         })
-    
-    
-    
+
+
+
     </script>
 
 </body>
 
 </html>
-

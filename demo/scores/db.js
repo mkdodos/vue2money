@@ -36,4 +36,4 @@ docs.forEach(doc => {
 });
 
 
-export default rows;
+export  {db,rows};
