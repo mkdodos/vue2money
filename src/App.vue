@@ -38,7 +38,8 @@
     </v-app-bar>
 
     <v-main>
-      <!-- <Stock/> -->
+
+      <Toolbar/>
       <router-view></router-view>
 
     </v-main>
@@ -47,12 +48,12 @@
 
 <script>
 // import HelloWorld from './components/HelloWorld';
-// import Stock from './components/Stock';
+import Toolbar from './components/Toolbar';
 export default {
   name: 'App',
 
   components: {
-    // Stock,
+    Toolbar,
   },
 
   data: () => ({
