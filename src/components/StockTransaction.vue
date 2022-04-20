@@ -81,7 +81,7 @@ import {
 
 import db from "../db.js";
 
-const collection_name = "stocks";
+const collection_name = "stockTransaction";
 
 export default {
   data() {
@@ -178,7 +178,7 @@ export default {
     async create() {
       // console.log(Timestamp.fromDate(new Date(this.editRow.date)))
       let newDate = Timestamp.fromDate(new Date(this.editRow.date));
-      await addDoc(collection(db, "stocks"), {
+      await addDoc(collection(db, collection_name), {
         date: newDate,
         stockName: this.editRow.stockName,
         qty: this.editRow.qty,
@@ -201,14 +201,29 @@ export default {
 
       // this.editRow.date = Timestamp.fromDate(new Date(this.editRow.date));
 
+      // this.editedItem.date = Timestamp.fromDate(
+      //           new Date(this.editedItem.date)
+      //         );
+
       item.date = Timestamp.fromDate(new Date(item.date));
       const docRef = doc(db, collection_name, item.id);
-      await updateDoc(docRef, item);
-      // console.log(this.editedIndex)
-      Object.assign(this.rows[this.editedIndex], item);
-      this.dialog = false;
-      this.editRow = {};
-      this.editedIndex = -1;
+      await updateDoc(docRef, item).then(() => {
+        // item.date = item.date
+        // .toDate()
+        // .toISOString()
+        // .slice(0, 10);
+        Object.assign(this.rows[this.editedIndex], item);
+        this.dialog = false;
+        this.editRow = {};
+        this.editedIndex = -1;
+      });
+      // 轉成日期輸入框可接受格式
+
+      // this.editRow.date = item.date
+      //   .toDate()
+      //   .toISOString()
+      //   .slice(0, 10);
+      // console.log(item.date)
     },
     // 刪除
     async destory(item) {
@@ -222,18 +237,17 @@ export default {
     },
     async getMoney() {
       let q = "";
-      if (this.id != null){
-        q = query(collection(db, "stocks"), where("stockID", "==", this.id));
+      if (this.id != null) {
+        q = query(
+          collection(db, collection_name),
+          where("stockID", "==", this.id)
+        );
         console.log("ddd");
-      }
-        
-      else {
-        q = collection(db, "stocks");
+      } else {
+        q = collection(db, collection_name);
       }
 
       // console.log(this.$route.params);
-
-      
 
       // const querySnapshot = await getDocs(q);
 
@@ -245,7 +259,6 @@ export default {
         let row = doc.data(); //1筆資料(不含id)
         row.id = doc.id; //加入id
         this.rows.push(row);
-        
       });
     }
   }
