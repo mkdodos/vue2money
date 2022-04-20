@@ -107,7 +107,7 @@ export default {
     };
   },
   created() {
-    console.log(this.id);
+    // console.log(this.id);
     this.getMoney();
   },
   computed: {
@@ -231,7 +231,7 @@ export default {
         q = collection(db, "stocks");
       }
 
-      console.log(this.$route.params);
+      // console.log(this.$route.params);
 
       
 
