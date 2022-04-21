@@ -146,23 +146,25 @@ export default {
     },
     // 編輯
     edit(item) {
-      // console.log(item.date);
+      console.log(item.date);
       this.editedIndex = this.rows.indexOf(item);
-      console.log(this.editedIndex);
+      // console.log(this.editedIndex);
       // 選取列 item 設定給編輯列
       this.editRow = Object.assign({}, item);
-      // 轉成日期輸入框可接受格式
+      console.log(this.editRow)
+      // gt 轉成日期輸入框可接受格式
       this.editRow.date = this.editRow.date
         .toDate()
         .toISOString()
         .slice(0, 10);
+        console.log(this.editRow)
       this.dialog = true;
     },
     // 儲存
     save() {
       // 判斷 editedIndex -1 為 新增
       if (this.editedIndex > -1) {
-        this.update(this.editRow);
+        this.update();
         // this.editedIndex = -1;
         //  Uncaught (in promise) TypeError:
         //  Cannot convert undefined or null to object at Function.assign
@@ -196,34 +198,21 @@ export default {
       });
     },
     // 更新
-    async update(item) {
+    async update() {
       // 將編輯列更新為表單的資料
-
-      // this.editRow.date = Timestamp.fromDate(new Date(this.editRow.date));
-
-      // this.editedItem.date = Timestamp.fromDate(
-      //           new Date(this.editedItem.date)
-      //         );
-
-      item.date = Timestamp.fromDate(new Date(item.date));
-      const docRef = doc(db, collection_name, item.id);
-      await updateDoc(docRef, item).then(() => {
-        // item.date = item.date
-        // .toDate()
-        // .toISOString()
-        // .slice(0, 10);
-        Object.assign(this.rows[this.editedIndex], item);
+      // 2022-04-21 to timestamp
+      this.editRow.date = Timestamp.fromDate(new Date(this.editRow.date));  
+  
+      const docRef = doc(db, collection_name, this.editRow.id);
+      await updateDoc(docRef, this.editRow).then(() => {      
+       
+        Object.assign(this.rows[this.editedIndex], this.editRow);
+        // console.log(this.editRow.date)
         this.dialog = false;
         this.editRow = {};
         this.editedIndex = -1;
-      });
-      // 轉成日期輸入框可接受格式
-
-      // this.editRow.date = item.date
-      //   .toDate()
-      //   .toISOString()
-      //   .slice(0, 10);
-      // console.log(item.date)
+      });     
+   
     },
     // 刪除
     async destory(item) {
