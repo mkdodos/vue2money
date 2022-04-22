@@ -2,6 +2,7 @@ import VueRouter from 'vue-router'
 import Login from '../components/Login';
 import Stock from '../components/Stock';
 import Spend from '../components/Spend';
+import Score from '../components/Score';
 import StockTransaction from '../components/StockTransaction';
 
 import '../firebase/init';
@@ -11,6 +12,7 @@ import { getAuth } from "firebase/auth";
 const router = new VueRouter({
     mode: 'history',
     routes: [
+        { name: 'Score', path: '/score', component: Score },
         { name: 'Spend', path: '/spend', component: Spend },
         { name: 'Login', path: '/login', component: Login },
         { name: 'Stock', path: '/stock', component: Stock },
