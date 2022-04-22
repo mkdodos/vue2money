@@ -3,7 +3,7 @@
     <!-- <ul v-for="row in rows" :key="row.id">
         <li>{{ row.name }}</li>
     </ul>-->
-<v-container>
+
     <v-data-table :headers="headers" :items="rows">
       <template v-slot:item.name="{item}">
         <router-link :to="{name:'StockTransaction',params:{id:item.id}}">
@@ -12,7 +12,7 @@
         
         </template>
     </v-data-table>
-</v-container>
+
     <!-- {{$route.params.id}} -->
   </div>
 </template>

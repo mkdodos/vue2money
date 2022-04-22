@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-app>
-      <v-container>
+      
         
         <v-row justify="center">
           <v-col md="8">
@@ -76,7 +76,7 @@
             </v-simple-table>
           </v-col>
         </v-row>
-      </v-container>
+     
     </v-app>
   </div>
 </template>

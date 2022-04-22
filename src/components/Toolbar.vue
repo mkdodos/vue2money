@@ -3,30 +3,25 @@
     <v-toolbar dense>
       <v-app-bar-nav-icon></v-app-bar-nav-icon>
       <!-- <v-toolbar-title>Title</v-toolbar-title> -->
-      
-      <v-spacer></v-spacer>
-      <v-btn text>
-       <router-link to="/score">score</router-link> 
-      </v-btn>
 
       <v-spacer></v-spacer>
-      <v-btn text>
-        <router-link to="/stock">stock</router-link>
-      </v-btn>
+      <v-btn text to="/score">Score</v-btn>
       <v-spacer></v-spacer>
-      <v-btn text>
-        <router-link to="/spend">spend</router-link>
-      </v-btn>
+      <v-btn to="/stock" text>Stock</v-btn>
       <v-spacer></v-spacer>
-      <v-btn text>
-        <router-link :to="{name:'StockTransactionAll'}">股票交易</router-link>
+      <v-btn to="/spend" text>Spend</v-btn>
+      <v-spacer></v-spacer>
+      <v-btn :to="{name:'StockTransactionAll'}" text>
+        股票交易
+        <!-- <router-link :to="{name:'StockTransactionAll'}">股票交易</router-link> -->
       </v-btn>
-      <v-btn icon>
+      <!-- <v-btn icon>
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
       <v-btn icon>
         <v-icon>mdi-heart</v-icon>
-      </v-btn>
+      </v-btn> -->
+      <v-spacer></v-spacer>
       <v-btn @click="logout">登出</v-btn>
     </v-toolbar>
   </div>
@@ -63,17 +58,17 @@ export default {
 </script>
 
 <style>
-a {
+/* a {
   text-decoration: none;
 }
-.router-link-exact-active{
-  /* color:red; */
-  padding:5px 20px;
+.router-link-exact-active {
+ 
+  padding: 5px 20px;
   background-color: rgba(255, 99, 132, 0.2);
-  border:1px rgba(255, 99, 132, 1) solid;
+  border: 1px rgba(255, 99, 132, 1) solid;
   border-radius: 5px;
 }
-.router-link-active{
-  color:red
-}
+.router-link-active {
+  color: red;
+} */
 </style>
