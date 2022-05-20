@@ -1,0 +1,17 @@
+<v-simple-table>
+  <thead>
+    <tr>         
+      <th>日期</th>
+      <th>項目</th>
+      <th>金額</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="(obj,index) in rows" :key="index">
+      <td>{{obj.spend_date}}</td>
+      <td>{{obj.note}}</td>
+      <td>{{obj.expense}}</td>
+    </tr>
+  </tbody>
+</v-simple-table>
