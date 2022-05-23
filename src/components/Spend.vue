@@ -8,6 +8,7 @@
 
       <v-row class="mb-6">
         <v-col class="text-left">
+          <!-- 刪除鈕 -->
           <v-icon
             v-if="editedIndex>-1"
             small
@@ -21,7 +22,11 @@
     </v-form>
 
     <v-text-field label="查詢" v-model="search" append-icon="mdi-magnify"></v-text-field>
-    <v-data-table :loading="loading" :headers="headers" :items="rows" :search="search"></v-data-table>
+    <v-data-table :loading="loading" :headers="headers" :items="rows" :search="search">
+      <template v-slot:item.actions="{ item }">
+        <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
+      </template>
+    </v-data-table>
   </div>
 </template>
 
@@ -33,7 +38,10 @@ import {
   orderBy,
   getDocs,
   where,
-  addDoc
+  addDoc,
+  doc,
+  updateDoc,
+  deleteDoc
 } from "firebase/firestore/lite";
 
 const collection_name = "spends";
@@ -47,7 +55,8 @@ export default {
         { text: "項目", value: "note", width: "300" },
         { text: "收入", value: "income" },
         { text: "支出", value: "expense" },
-        { text: "備註", value: "note_html" }
+        { text: "備註", value: "note_html" },
+        { text: "Actions", value: "actions" }
       ],
       loading: true,
       search: "",
@@ -57,27 +66,63 @@ export default {
         // 2022-03-16 配合日期輸入框可用格式 yyyy-mm-dd
         spend_date: new Date().toISOString().slice(0, 10)
       },
-       editedIndex: -1,
+      defaultItem: {
+        note: "",
+        expense: "",
+        spend_date: new Date().toISOString().slice(0, 10)
+      },
+      editedIndex: -1
     };
   },
   mounted() {
     this.getMoney();
   },
   methods: {
+    async deleteItem(id, index) {
+      if (!confirm("確定刪除")) return;
+      await deleteDoc(doc(db, collection_name, id));
+      this.rows.splice(index, 1);
+      this.editedItem = Object.assign({}, this.defaultItem);
+      this.editedIndex = -1;
+    },
+    editItem(item) {
+      // this.isEdit = true;
+      this.editedIndex = this.rows.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+    },
+
     async save() {
- // 新增
-        
-        await addDoc(collection(db, collection_name), {
-          spend_date: this.editedItem.spend_date,        
+      //更新
+      if (this.editedIndex > -1) {
+        const ref = doc(db, collection_name, this.editedItem.id);
+
+        await updateDoc(ref, this.editedItem);
+
+        // Object.assign(target, ...sources)
+        // 將表單的值傳回表格中
+        Object.assign(this.rows[this.editedIndex], this.editedItem);
+
+        this.$nextTick(() => {
+          // 將表單的值設成預設值
+          this.defaultItem.date = "";
+          this.editedItem = Object.assign({}, this.defaultItem);
+          this.editedIndex = -1;
+        });
+      } else {
+        // 新增
+
+        const docRef = await addDoc(collection(db, collection_name), {
+          spend_date: this.editedItem.spend_date,
           note: this.editedItem.note,
           expense: this.editedItem.expense
-        });        
-       
-       
-        // 將項目加入到資料列 
-        this.rows.unshift(this.editedItem);     
-        console.log(this.rows)
+        });
 
+        // 設定新增後取得的 id, 才可馬上做編輯
+        this.editedItem.id = docRef.id;
+        // 將項目加入到資料列
+        this.rows.unshift(this.editedItem);
+        console.log(this.rows);
+      }
     },
     async getMoney() {
       this.loading = true;
