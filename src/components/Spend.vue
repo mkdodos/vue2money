@@ -2,7 +2,7 @@
   <div>
     <v-row class="mb-6">
       <v-col>
-        <v-btn color="cyan" class="white--text" @click="dialog=true">新增</v-btn>
+        <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn>
       </v-col>
     </v-row>
 
@@ -23,8 +23,6 @@
               <v-col cols="12" sm="6" md="4">
                 <v-text-field label="金額" v-model="editedItem.expense" type="number"></v-text-field>
               </v-col>
-
-             
             </v-row>
           </v-container>
           <v-row class="mb-6">
@@ -44,7 +42,7 @@
       </v-card>
     </v-dialog>
     <v-text-field label="查詢" v-model="search" append-icon="mdi-magnify"></v-text-field>
-    
+
     <!-- 表格 -->
     <v-data-table
       mobile-breakpoint="360"
@@ -53,7 +51,7 @@
       :items="rows"
       :search="search"
     >
-     <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
+      <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
       <template v-slot:item.actions="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
       </template>
@@ -85,7 +83,7 @@ export default {
         // { text: "類別", value: "cate", width: "100" },
         { text: "項目", value: "note", width: "110" },
         // { text: "收入", value: "income" },
-        { text: "支出", value: "expense",width: "90" },
+        { text: "支出", value: "expense", width: "90" },
         // { text: "備註", value: "note_html" },
         { text: "", value: "actions" }
       ],
@@ -110,13 +108,19 @@ export default {
     this.getMoney();
   },
   methods: {
+    openDialog() {
+      // 避免按下編輯鈕,沒有儲存,再按新增,欄位留下原本要編輯的值
+      // 所以在此將值設為預設值
+      this.editedItem = Object.assign({}, this.defaultItem);
+      this.dialog = true;
+    },
     async deleteItem(id, index) {
       if (!confirm("確定刪除")) return;
       await deleteDoc(doc(db, collection_name, id));
       this.rows.splice(index, 1);
       this.editedItem = Object.assign({}, this.defaultItem);
       this.editedIndex = -1;
-      this.dialog = false
+      this.dialog = false;
     },
     editItem(item) {
       this.dialog = true;
@@ -157,7 +161,7 @@ export default {
         console.log(this.rows);
       }
 
-      this.dialog = false
+      this.dialog = false;
     },
     async getMoney() {
       this.loading = true;
