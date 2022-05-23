@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app dark>
-      <div class="d-flex align-center">理財專家 1.0</div>
+      <div class="d-flex align-center">理財</div>
       <!-- <div class="d-flex align-center">
         <v-img
           alt="Vuetify Logo"
