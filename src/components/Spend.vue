@@ -40,17 +40,22 @@
     <v-card>
       <v-card-title>
         <v-row class="mb-1" cols="4" justify="space-between">
-          <v-col>日常支出</v-col>
-          <v-col  cols="4">
+          <v-col @click="nextDay">{{ new Date(today).toISOString().slice(5, 10)}}</v-col>
+           <v-col cols="2">
+            <v-btn color="cyan" class="white--text" @click="preDay">-</v-btn>
+          </v-col>
+           <v-col cols="2">
+            <v-btn color="cyan" class="white--text" @click="nextDay">+</v-btn>
+          </v-col>
+          <v-col cols="4">
             <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn>
           </v-col>
         </v-row>
-
-     
       </v-card-title>
       <v-card-text>
         <!-- 表格 -->
         <v-data-table
+        :items-per-page = "100"
           :hide-default-footer="true"
           mobile-breakpoint="360"
           :loading="loading"
@@ -74,7 +79,7 @@ import db from "../db.js";
 import {
   collection,
   query,
-  orderBy,
+  // orderBy,
   getDocs,
   where,
   addDoc,
@@ -93,7 +98,7 @@ export default {
         // { text: "類別", value: "cate", width: "100" },
         { text: "項目", value: "note", width: "200" },
         // { text: "收入", value: "income" },
-        { text: "支出", value: "expense", width: "90" }
+        { text: "金額", value: "expense", width: "90" }
         // { text: "備註", value: "note_html" },
         // { text: "", value: "actions" }
       ],
@@ -111,13 +116,35 @@ export default {
         expense: "",
         spend_date: new Date().toISOString().slice(0, 10)
       },
-      editedIndex: -1
+      editedIndex: -1,
+      today: new Date().getTime()
+      
     };
   },
   mounted() {
     this.getMoney();
+    
+    console.log(new Date(this.today))
+    // this.today = this.today + 86400000;
+    //  console.log(new Date(this.today))
+    // console.log(this.today)
   },
-  methods: {
+  methods: {    
+    theDate() {
+      return new Date(this.today).toISOString().slice(0, 10)
+    },
+    nextDay() {
+       this.today = this.today + 86400000;
+       this.getMoney();
+    
+      //  console.log(new Date(this.today))     
+    },
+    preDay() {
+       this.today = this.today - 86400000;
+       this.getMoney();
+    
+      //  console.log(new Date(this.today))     
+    },
     openDialog() {
       // 避免按下編輯鈕,沒有儲存,再按新增,欄位留下原本要編輯的值
       // 所以在此將值設為預設值
@@ -168,21 +195,25 @@ export default {
         this.editedItem.id = docRef.id;
         // 將項目加入到資料列
         this.rows.unshift(this.editedItem);
-        console.log(this.rows);
+        // console.log(this.rows);
       }
 
       this.dialog = false;
     },
     async getMoney() {
+      this.rows = []
       this.loading = true;
+      console.log(this.theDate())
       const citiesCol = collection(db, collection_name);
       // const q = query(citiesCol, orderBy("spend_date", "desc"));
       // const q = query(citiesRef, where("state", "==", "CA"));
       const q = query(
         citiesCol,
-        orderBy("spend_date", "desc"),
-        where("spend_date", ">=", "2022-05-18"),
-        where("spend_date", "<=", "2022-05-23")
+        // where 用 == 不能用 orderBy
+        // orderBy("spend_date", "desc"),
+        where("spend_date", "==", this.theDate())
+        // ,
+        // where("spend_date", "<=", "2022-05-31")
       );
       const citySnapshot = await getDocs(q);
       citySnapshot.forEach(doc => {
