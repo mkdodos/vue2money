@@ -35,27 +35,36 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-text-field label="查詢" v-model="search" append-icon="mdi-magnify"></v-text-field>
+    <v-text-field label="" v-model="search" append-icon="mdi-magnify"></v-text-field>
+
+    <v-row justify="space-between" class="mb-3">
+      <v-col cols="2">
+        <v-btn color="cyan" class="white--text" @click="preDay">
+          <v-icon>mdi-arrow-left</v-icon>
+        </v-btn>
+      </v-col>
+      <v-col cols="2">
+        <v-btn color="cyan" class="white--text" @click="nextDay">
+          <v-icon>mdi-arrow-right</v-icon>
+        </v-btn>
+      </v-col>
+      <v-col cols="4">
+        <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn>
+      </v-col>
+    </v-row>
 
     <v-card>
       <v-card-title>
         <v-row class="mb-1" cols="4" justify="space-between">
           <v-col @click="nextDay">{{ new Date(today).toISOString().slice(5, 10)}}</v-col>
-           <v-col cols="2">
-            <v-btn color="cyan" class="white--text" @click="preDay">-</v-btn>
-          </v-col>
-           <v-col cols="2">
-            <v-btn color="cyan" class="white--text" @click="nextDay">+</v-btn>
-          </v-col>
-          <v-col cols="4">
-            <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn>
-          </v-col>
+
+          <v-col cols="4">{{ getTotal(rows) }}</v-col>
         </v-row>
       </v-card-title>
       <v-card-text>
         <!-- 表格 -->
         <v-data-table
-        :items-per-page = "100"
+          :items-per-page="100"
           :hide-default-footer="true"
           mobile-breakpoint="360"
           :loading="loading"
@@ -117,33 +126,50 @@ export default {
         spend_date: new Date().toISOString().slice(0, 10)
       },
       editedIndex: -1,
-      today: new Date().getTime()
-      
+      today: new Date().getTime(),
+      total: 0
     };
   },
   mounted() {
     this.getMoney();
-    
-    console.log(new Date(this.today))
-    // this.today = this.today + 86400000;
-    //  console.log(new Date(this.today))
-    // console.log(this.today)
+    // console.log(this.rows[0])
   },
-  methods: {    
+  methods: {
+    // 加總金額
+    // 金額加總
+    // 金額加總
+    getTotal(arr) {
+      console.log(arr);
+      const total = Object.keys(arr).reduce(function(previous, key) {
+        return previous + arr[key].expense * 1;
+      }, 0);
+      return total;
+    },
+    // calTotal() {
+
+    // 0 + 1 + 2 + 3 + 4
+    // const initialValue = 0;
+    // const total = nums.reduce(
+    //   (previousValue, currentValue) => previousValue + currentValue,
+    //   initialValue
+    // );
+    // return '123';
+    // },
+    // 做為查詢的日期 2022-05-24
     theDate() {
-      return new Date(this.today).toISOString().slice(0, 10)
+      return new Date(this.today).toISOString().slice(0, 10);
     },
     nextDay() {
-       this.today = this.today + 86400000;
-       this.getMoney();
-    
-      //  console.log(new Date(this.today))     
+      this.today = this.today + 86400000;
+      this.getMoney();
+
+      //  console.log(new Date(this.today))
     },
     preDay() {
-       this.today = this.today - 86400000;
-       this.getMoney();
-    
-      //  console.log(new Date(this.today))     
+      this.today = this.today - 86400000;
+      this.getMoney();
+
+      //  console.log(new Date(this.today))
     },
     openDialog() {
       // 避免按下編輯鈕,沒有儲存,再按新增,欄位留下原本要編輯的值
@@ -201,9 +227,9 @@ export default {
       this.dialog = false;
     },
     async getMoney() {
-      this.rows = []
+      this.rows = [];
       this.loading = true;
-      console.log(this.theDate())
+      console.log(this.theDate());
       const citiesCol = collection(db, collection_name);
       // const q = query(citiesCol, orderBy("spend_date", "desc"));
       // const q = query(citiesRef, where("state", "==", "CA"));
@@ -221,8 +247,17 @@ export default {
         row.id = doc.id;
         this.rows.push(row);
       });
+      let nums = this.rows.map(row => row.expense);
+      const initialValue = 0;
+      console.log(nums);
+      this.total = nums.reduce(
+        (previousValue, currentValue) => previousValue * 1 + currentValue * 1,
+        initialValue
+      );
+      // return total;
+      // console.log(this.total)
       this.loading = false;
-      console.log(this.rows);
+      // console.log(this.rows);
     }
   }
 };
