@@ -1,11 +1,5 @@
 <template>
   <div>
-    <v-row class="mb-6">
-      <v-col>
-        <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn>
-      </v-col>
-    </v-row>
-
     <!-- 輸入表單 -->
     <v-dialog v-model="dialog" width="500">
       <v-card>
@@ -43,19 +37,35 @@
     </v-dialog>
     <v-text-field label="查詢" v-model="search" append-icon="mdi-magnify"></v-text-field>
 
-    <!-- 表格 -->
-    <v-data-table
-      mobile-breakpoint="360"
-      :loading="loading"
-      :headers="headers"
-      :items="rows"
-      :search="search"
-    >
-      <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
-      <template v-slot:item.actions="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
-      </template>
-    </v-data-table>
+    <v-card>
+      <v-card-title>
+        <v-row class="mb-1" cols="4" justify="space-between">
+          <v-col>日常支出</v-col>
+          <v-col  cols="4">
+            <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn>
+          </v-col>
+        </v-row>
+
+     
+      </v-card-title>
+      <v-card-text>
+        <!-- 表格 -->
+        <v-data-table
+          :hide-default-footer="true"
+          mobile-breakpoint="360"
+          :loading="loading"
+          :headers="headers"
+          :items="rows"
+          :search="search"
+          @click:row="editItem"
+        >
+          <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
+          <template v-slot:item.actions="{ item }">
+            <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
+          </template>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
   </div>
 </template>
 
@@ -79,13 +89,13 @@ export default {
     return {
       rows: [],
       headers: [
-        { text: "日期", value: "spend_date", width: "90" },
+        // { text: "日期", value: "spend_date", width: "90" },
         // { text: "類別", value: "cate", width: "100" },
-        { text: "項目", value: "note", width: "110" },
+        { text: "項目", value: "note", width: "200" },
         // { text: "收入", value: "income" },
-        { text: "支出", value: "expense", width: "90" },
+        { text: "支出", value: "expense", width: "90" }
         // { text: "備註", value: "note_html" },
-        { text: "", value: "actions" }
+        // { text: "", value: "actions" }
       ],
       dialog: false,
       loading: true,
@@ -171,7 +181,7 @@ export default {
       const q = query(
         citiesCol,
         orderBy("spend_date", "desc"),
-        where("spend_date", ">=", "2022-05-23"),
+        where("spend_date", ">=", "2022-05-18"),
         where("spend_date", "<=", "2022-05-23")
       );
       const citySnapshot = await getDocs(q);
