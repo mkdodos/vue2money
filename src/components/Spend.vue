@@ -35,7 +35,14 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-text-field label="" v-model="search" append-icon="mdi-magnify"></v-text-field>
+    <v-row>
+      <v-col cols="8">
+        <v-text-field label v-model="search" append-icon="mdi-magnify"></v-text-field>
+      </v-col>
+      <v-col cols="4">
+        <v-btn color="cyan" class="white--text" @click="queryRows">查詢</v-btn>
+      </v-col>
+    </v-row>
 
     <v-row justify="space-between" class="mb-3">
       <v-col cols="2">
@@ -73,7 +80,7 @@
           :search="search"
           @click:row="editItem"
         >
-          <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
+          <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(0,10) }}</template>
           <template v-slot:item.actions="{ item }">
             <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
           </template>
@@ -94,7 +101,8 @@ import {
   addDoc,
   doc,
   updateDoc,
-  deleteDoc
+  deleteDoc,
+  // orderBy
 } from "firebase/firestore/lite";
 
 const collection_name = "spends";
@@ -103,7 +111,7 @@ export default {
     return {
       rows: [],
       headers: [
-        // { text: "日期", value: "spend_date", width: "90" },
+        // { text: "日期", value: "spend_date", width: "0" },
         // { text: "類別", value: "cate", width: "100" },
         { text: "項目", value: "note", width: "200" },
         // { text: "收入", value: "income" },
@@ -145,16 +153,31 @@ export default {
       }, 0);
       return total;
     },
-    // calTotal() {
+    async queryRows() {
+      this.headers.push( { text: "日期", value: "spend_date", width: "100" } )
+      this.rows = [];
+      this.loading = true;     
+      const citiesCol = collection(db, collection_name);     
+      const q = query(
+        citiesCol,
+        where('note', '>=', this.search),
+        where('note', '<=', this.search+'\uf8ff'),
+        // orderBy('note','desc'),
+        // orderBy('spend_date','desc')
 
-    // 0 + 1 + 2 + 3 + 4
-    // const initialValue = 0;
-    // const total = nums.reduce(
-    //   (previousValue, currentValue) => previousValue + currentValue,
-    //   initialValue
-    // );
-    // return '123';
-    // },
+      );
+
+
+      const citySnapshot = await getDocs(q);
+      citySnapshot.forEach(doc => {
+        let row = doc.data();
+        row.id = doc.id;
+        this.rows.push(row);
+      });
+
+      this.loading = false;
+      console.log('query')
+    },
     // 做為查詢的日期 2022-05-24
     theDate() {
       return new Date(this.today).toISOString().slice(0, 10);
@@ -162,12 +185,14 @@ export default {
     nextDay() {
       this.today = this.today + 86400000;
       this.getMoney();
+      this.headers.splice(2,1)
 
       //  console.log(new Date(this.today))
     },
     preDay() {
       this.today = this.today - 86400000;
       this.getMoney();
+      this.headers.splice(2,1)
 
       //  console.log(new Date(this.today))
     },
@@ -226,13 +251,11 @@ export default {
 
       this.dialog = false;
     },
+    // 單日資料
     async getMoney() {
       this.rows = [];
-      this.loading = true;
-      console.log(this.theDate());
-      const citiesCol = collection(db, collection_name);
-      // const q = query(citiesCol, orderBy("spend_date", "desc"));
-      // const q = query(citiesRef, where("state", "==", "CA"));
+      this.loading = true;     
+      const citiesCol = collection(db, collection_name);     
       const q = query(
         citiesCol,
         // where 用 == 不能用 orderBy
@@ -247,17 +270,9 @@ export default {
         row.id = doc.id;
         this.rows.push(row);
       });
-      let nums = this.rows.map(row => row.expense);
-      const initialValue = 0;
-      console.log(nums);
-      this.total = nums.reduce(
-        (previousValue, currentValue) => previousValue * 1 + currentValue * 1,
-        initialValue
-      );
-      // return total;
-      // console.log(this.total)
+
       this.loading = false;
-      // console.log(this.rows);
+      
     }
   }
 };
