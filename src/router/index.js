@@ -2,6 +2,7 @@ import VueRouter from 'vue-router'
 import Login from '../components/Login';
 import Stock from '../components/Stock';
 import Spend from '../components/Spend';
+import SpendTab from '../components/SpendTab';
 import Score from '../components/Score';
 import StockTransaction from '../components/StockTransaction';
 
@@ -14,6 +15,7 @@ const router = new VueRouter({
     routes: [
         { name: 'Score', path: '/score', component: Score },
         { name: 'Spend', path: '/spend', component: Spend },
+        { name: 'SpendTab', path: '/spend-tab', component: SpendTab },
         { name: 'Login', path: '/login', component: Login },
         { name: 'Stock', path: '/stock', component: Stock },
         { name: 'StockTransaction', path: '/stock-transaction/:id', component: StockTransaction },

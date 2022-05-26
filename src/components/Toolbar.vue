@@ -11,6 +11,8 @@
       <v-spacer></v-spacer>
       <v-btn to="/spend" text>Spend</v-btn>
       <v-spacer></v-spacer>
+      <v-btn to="/spend-tab" text>SpendTab</v-btn>
+      <v-spacer></v-spacer>
       <v-btn :to="{name:'StockTransactionAll'}" text>
         股票交易
         <!-- <router-link :to="{name:'StockTransactionAll'}">股票交易</router-link> -->
