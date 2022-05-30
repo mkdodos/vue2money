@@ -110,6 +110,7 @@ export default {
   data() {
     return {
       rows: [],
+      cates:[],
       headers: [
         // { text: "日期", value: "spend_date", width: "0" },
         // { text: "類別", value: "cate", width: "100" },

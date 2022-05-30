@@ -9,6 +9,8 @@
       <v-spacer></v-spacer>
       <v-btn to="/stock" text>Stock</v-btn>
       <v-spacer></v-spacer>
+        <v-btn to="/spend/cate" text>SpendCate</v-btn>
+      <v-spacer></v-spacer>
       <v-btn to="/spend" text>Spend</v-btn>
       <v-spacer></v-spacer>
       <v-btn to="/spend-tab" text>SpendTab</v-btn>
