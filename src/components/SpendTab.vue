@@ -45,9 +45,9 @@ export default {
       // 資料
       rows: [],
       headers: [
-        { text: "帳戶", value: "account", width: "100" },
-        { text: "cate", value: "cate", width: "100" },
-        { text: "類別", value: "cateCht", width: "100" },
+        // { text: "帳戶", value: "account", width: "100" },
+        // { text: "cate", value: "cate", width: "100" },
+        { text: "類別", value: "cate_name", width: "100" },
         { text: "日期", value: "spend_date", width: "100" },
         { text: "項目", value: "note", width: "200" },
         { text: "收入", value: "income", width: "90" },
@@ -57,19 +57,23 @@ export default {
     };
   },
   created() {
-    for (let i = 0; i <= 12; i++) {
-      if (i < 10) {
-        i = "0" + i;
-      }
-      this.months.push(i);
-    }
-    let m = new Date().getMonth() + 1;
-    if (m < 10) {
-      m = "0" + m;
-    }
-    this.search.m = m;
+    this.monthData()
+    this.getDataYM()
   },
   methods: {
+    monthData() {
+      for (let i = 0; i <= 12; i++) {
+        if (i < 10) {
+          i = "0" + i;
+        }
+        this.months.push(i);
+      }
+      let m = new Date().getMonth() + 1;
+      if (m < 10) {
+        m = "0" + m;
+      }
+      this.search.m = m;
+    },
     async getDataYM() {
       this.rows = [];
       this.loading = true;
