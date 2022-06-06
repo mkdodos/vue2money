@@ -12,10 +12,15 @@
         <v-btn @click="getDataYM">查詢</v-btn>
       </v-col>
     </v-row>
+    <v-row>
+      <v-col>
+        <v-text-field v-model="search.keyword" append-icon="mdi-magnify"></v-text-field>
+      </v-col>
+    </v-row>
     <!-- 表格 -->
     <v-row>
       <v-col>
-        <v-data-table :headers="headers" :items="rows" :loading="loading"></v-data-table>
+        <v-data-table :headers="headers" :items="rows" :search="search.keyword" :loading="loading"></v-data-table>
       </v-col>
     </v-row>
   </div>
@@ -36,7 +41,7 @@ export default {
     return {
       // 查詢預設當年月
       search: { y: new Date().getFullYear(), m: new Date().getMonth() + 1 },
-      months:[],
+      months: [],
       // 資料
       rows: [],
       headers: [
@@ -52,47 +57,53 @@ export default {
     };
   },
   created() {
-    
-    for(let i=1;i<=12;i++){
-      if(i<10){
-        i='0'+i
+    for (let i = 0; i <= 12; i++) {
+      if (i < 10) {
+        i = "0" + i;
       }
-      this.months.push(i)      
+      this.months.push(i);
     }
-    let m = new Date().getMonth() + 1
-    if(m<10){
-      m='0'+m
+    let m = new Date().getMonth() + 1;
+    if (m < 10) {
+      m = "0" + m;
     }
-    this.search.m = m
-    
-    
+    this.search.m = m;
   },
   methods: {
-
     async getDataYM() {
       this.rows = [];
-      this.loading = true
+      this.loading = true;
       const citiesCol = collection(db, "spends");
-      const q = query(
+      // 依年查詢
+      let q = query(
         citiesCol,
-        orderBy("spend_date", "desc"),       
-        where(
-          "spend_date",
-          ">=",
-          this.search.y+"-"+this.search.m+"-01"
-        ),
-        where(
-          "spend_date",
-          "<=",
-          this.search.y+"-"+this.search.m+"-31"
-        ),
-        limit(1000)
+        orderBy("spend_date", "desc"),
+        where("spend_date", ">=", this.search.y + "-01-01"),
+        where("spend_date", "<=", this.search.y + "-12-31"),
+        limit(10000)
       );
+      // 依年月查詢 (有選擇月)
+      if (this.search.m != "00")
+        q = query(
+          citiesCol,
+          orderBy("spend_date", "desc"),
+          where(
+            "spend_date",
+            ">=",
+            this.search.y + "-" + this.search.m + "-01"
+          ),
+          where(
+            "spend_date",
+            "<=",
+            this.search.y + "-" + this.search.m + "-31"
+          ),
+          limit(1000)
+        );
       const docSnapBig = await getDocs(q);
       docSnapBig.forEach(doc => {
         this.rows.push({ ...doc.data(), id: doc.id });
       });
-      this.loading = false
+      this.loading = false;
       console.log(this.rows);
     }
   }
