@@ -21,7 +21,12 @@
               </v-col>
 
               <v-col cols="12" sm="6" md="6">
-                <v-text-field label="金額" append-icon="mdi-currency-usd" v-model="editedItem.expense" type="number"></v-text-field>
+                <v-text-field
+                  label="金額"
+                  append-icon="mdi-currency-usd"
+                  v-model="editedItem.expense"
+                  type="number"
+                ></v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -41,28 +46,36 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-row>
-      <v-col cols="8">
+    <v-row justify="space-between">
+      <v-col cols="12">
         <v-text-field label v-model="search" append-icon="mdi-magnify"></v-text-field>
       </v-col>
-      <v-col cols="4">
-        <v-btn color="cyan" class="white--text" @click="queryRows">查詢</v-btn>
-      </v-col>
+      <!-- <v-col cols="4">
+        <v-btn color="cyan" class="white--text" @click="queryRows">
+          查詢
+          <v-icon right>mdi-magnify</v-icon>
+        </v-btn>
+      </v-col> -->
     </v-row>
 
     <v-row justify="space-between" class="mb-3">
-      <v-col cols="2">
+      <v-col cols="4">
         <v-btn color="cyan" class="white--text" @click="preDay">
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
       </v-col>
-      <v-col cols="2">
+      <v-col cols="4">
         <v-btn color="cyan" class="white--text" @click="nextDay">
           <v-icon>mdi-arrow-right</v-icon>
         </v-btn>
       </v-col>
       <v-col cols="4">
-        <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn>
+        <!-- <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn> -->
+        <!-- <v-btn @click="openDialog" color="blue-grey" class="ma-2 white--text"> -->
+           <v-btn @click="openDialog" color="blue-grey" class="white--text">
+          新增
+          <!-- <v-icon>mdi-plus-circle-outline</v-icon> -->
+        </v-btn>
       </v-col>
     </v-row>
 
@@ -119,7 +132,7 @@ export default {
       cates: ["餐費", "加油", "水電"],
       headers: [
         // { text: "日期", value: "spend_date", width: "0" },
-        { text: "類別", value: "cate_name", width: "100" },
+        // { text: "類別", value: "cate_name", width: "100" },
         { text: "項目", value: "note", width: "200" },
         // { text: "收入", value: "income" },
         { text: "金額", value: "expense", width: "90" }
@@ -248,7 +261,6 @@ export default {
           expense: this.editedItem.expense
         });
 
-        
         // 設定新增後取得的 id, 才可馬上做編輯
         this.editedItem.id = docRef.id;
         // 將項目加入到資料列
