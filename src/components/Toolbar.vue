@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-toolbar dense>
-      
+     
 
       <v-menu offset-y>
         <template v-slot:activator="{ on, attrs }">
@@ -25,6 +25,8 @@
           </v-list-item>
         </v-list>
       </v-menu>
+       <v-btn to="/spend" text>Spend</v-btn>
+      <v-btn to="/spend-tab" text>SpendTab</v-btn>
     </v-toolbar>
   </div>
 </template>

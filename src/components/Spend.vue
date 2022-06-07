@@ -55,7 +55,7 @@
           查詢
           <v-icon right>mdi-magnify</v-icon>
         </v-btn>
-      </v-col> -->
+      </v-col>-->
     </v-row>
 
     <v-row justify="space-between" class="mb-3">
@@ -72,7 +72,7 @@
       <v-col cols="4">
         <!-- <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn> -->
         <!-- <v-btn @click="openDialog" color="blue-grey" class="ma-2 white--text"> -->
-           <v-btn @click="openDialog" color="blue-grey" class="white--text">
+        <v-btn @click="openDialog" color="blue-grey" class="white--text">
           新增
           <!-- <v-icon>mdi-plus-circle-outline</v-icon> -->
         </v-btn>
@@ -83,7 +83,7 @@
       <v-card-title>
         <v-row class="mb-1" cols="4" justify="space-between">
           <v-col @click="nextDay">{{ new Date(today).toISOString().slice(5, 10)}}</v-col>
-
+          <!-- 合計 -->
           <v-col cols="4">{{ getTotal(rows) }}</v-col>
         </v-row>
       </v-card-title>
@@ -132,7 +132,7 @@ export default {
       cates: ["餐費", "加油", "水電"],
       headers: [
         // { text: "日期", value: "spend_date", width: "0" },
-        // { text: "類別", value: "cate_name", width: "100" },
+        { text: "類別", value: "cate_name", width: "100" },
         { text: "項目", value: "note", width: "200" },
         // { text: "收入", value: "income" },
         { text: "金額", value: "expense", width: "90" }
@@ -163,11 +163,8 @@ export default {
     // console.log(this.rows[0])
   },
   methods: {
-    // 加總金額
-    // 金額加總
-    // 金額加總
-    getTotal(arr) {
-      console.log(arr);
+    // 合計
+    getTotal(arr) {      
       const total = Object.keys(arr).reduce(function(previous, key) {
         return previous + arr[key].expense * 1;
       }, 0);
