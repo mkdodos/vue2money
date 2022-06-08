@@ -46,7 +46,7 @@
     </v-dialog>
     <v-btn @click="openDialog" color="blue-grey" class="white--text">新增</v-btn>
     <v-data-table :items="rows" :headers="headers" :loading="loading"
-    @click:row="editItem"
+    @click:row="editItem" mobile-breakpoint="300"
     ></v-data-table>
   </div>
 </template>
@@ -71,7 +71,7 @@ export default {
       // 資料
       rows: [],
       headers: [
-        { text: "日期", value: "date", width: "60" },
+        { text: "日期", value: "date", width: "120" },
         { text: "項目", value: "title", width: "150" },
         { text: "金額", value: "amt", width: "90" }
       ],

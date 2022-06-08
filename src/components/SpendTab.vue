@@ -72,18 +72,21 @@
         <v-chip class="ma-2">{{ getTotal(rows) }}</v-chip>
       </v-col>
     </v-row>
-    <v-row>
+    <!-- <v-row> -->
       <!-- <v-col cols="2"></v-col> -->
-      <v-col cols="12">
+      <!-- <v-col cols="12"> -->
         <v-data-table
+        mobile-breakpoint="300"
           @click:row="editItem"
           :headers="headers"
           :items="rows"
           :search="search.keyword"
           :loading="loading"
-        ></v-data-table>
-      </v-col>
-    </v-row>
+        >
+        <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
+        </v-data-table>
+      <!-- </v-col> -->
+    <!-- </v-row> -->
   </div>
 </template>
 
@@ -121,11 +124,11 @@ export default {
       headers: [
         // { text: "帳戶", value: "account", width: "100" },
         // { text: "cate", value: "cate", width: "100" },
-        { text: "類別", value: "cate_name", width: "60" },
-        { text: "日期", value: "spend_date", width: "60" },
-        { text: "項目", value: "note", width: "150" },
+        // { text: "類別", value: "cate_name", width: "60" },
+        { text: "日期", value: "spend_date", width: "70" },
+        { text: "項目", value: "note", width: "120" },
         // { text: "收入", value: "income", width: "90" },
-        { text: "支出", value: "expense", width: "90" }
+        { text: "支出", value: "expense", width: "70" }
       ],
       loading: false
     };
