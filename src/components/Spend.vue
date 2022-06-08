@@ -132,7 +132,7 @@ export default {
       cates: ["餐費", "加油", "水電"],
       headers: [
         // { text: "日期", value: "spend_date", width: "0" },
-        { text: "類別", value: "cate_name", width: "100" },
+        // { text: "類別", value: "cate_name", width: "100" },
         { text: "項目", value: "note", width: "200" },
         // { text: "收入", value: "income" },
         { text: "金額", value: "expense", width: "90" }

@@ -4,6 +4,7 @@ import Stock from '../components/Stock';
 import Spend from '../components/Spend';
 import SpendCate from '../components/SpendCate';
 import SpendTab from '../components/SpendTab';
+import CashIn from '../components/CashIn';
 import Score from '../components/Score';
 import StockTransaction from '../components/StockTransaction';
 
@@ -18,6 +19,7 @@ const router = new VueRouter({
         { name: 'SpendCate', path: '/spend/cate', component: SpendCate },
         { name: 'Spend', path: '/spend', component: Spend },
         { name: 'SpendTab', path: '/spend-tab', component: SpendTab },
+        { name: 'CashIn', path: '/cash-in', component: CashIn },
         { name: 'Login', path: '/login', component: Login },
         { name: 'Stock', path: '/stock', component: Stock },
         { name: 'StockTransaction', path: '/stock-transaction/:id', component: StockTransaction },

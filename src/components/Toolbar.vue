@@ -23,10 +23,16 @@
               <v-btn to="/spend-tab" text>SpendTab</v-btn>
             </v-list-item-title>
           </v-list-item>
+           <v-list-item >
+            <v-list-item-title>
+              <v-btn to="/cash-in" text>Cash In</v-btn>
+            </v-list-item-title>
+          </v-list-item>
         </v-list>
       </v-menu>
        <v-btn to="/spend" text>Spend</v-btn>
       <v-btn to="/spend-tab" text>SpendTab</v-btn>
+      <v-btn to="/cash-in" text>Cash In</v-btn>
     </v-toolbar>
   </div>
 </template>

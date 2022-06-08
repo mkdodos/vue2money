@@ -1,7 +1,6 @@
 <template>
   <div>
-
- <!-- 輸入表單 -->
+    <!-- 輸入表單 -->
     <v-dialog v-model="dialog" width="500">
       <v-card>
         <v-card-title class="text-h5 lighten-2">編輯</v-card-title>
@@ -31,7 +30,7 @@
               </v-col>
             </v-row>
           </v-container>
-         <v-row class="mb-6">
+          <v-row class="mb-6">
             <v-col class="text-left">
               <!-- 刪除鈕 -->
               <v-icon
@@ -44,11 +43,9 @@
               <v-btn color="green" class="white--text" @click="save">儲存</v-btn>
             </v-col>
           </v-row>
-
         </v-card-text>
       </v-card>
     </v-dialog>
-
 
     <v-row>
       <v-col>
@@ -78,9 +75,13 @@
     <v-row>
       <!-- <v-col cols="2"></v-col> -->
       <v-col cols="12">
-        <v-data-table 
-        @click:row="editItem"
-        :headers="headers" :items="rows" :search="search.keyword" :loading="loading"></v-data-table>
+        <v-data-table
+          @click:row="editItem"
+          :headers="headers"
+          :items="rows"
+          :search="search.keyword"
+          :loading="loading"
+        ></v-data-table>
       </v-col>
     </v-row>
   </div>
@@ -105,7 +106,7 @@ export default {
     return {
       editedIndex: -1,
       dialog: false,
-       defaultItem: {
+      defaultItem: {
         note: "",
         expense: "",
         spend_date: new Date().toISOString().slice(0, 10)
@@ -149,8 +150,6 @@ export default {
       var formatter = new Intl.NumberFormat("en-US", {
         // style: "currency",
         currency: "USD"
-
-       
       });
 
       total = formatter.format(total); /* $2,500.00 */
@@ -170,10 +169,10 @@ export default {
       }
       this.search.m = m;
     },
-     async save() {
+    async save() {
       //更新
       if (this.editedIndex > -1) {
-        const ref = doc(db, 'spends', this.editedItem.id);
+        const ref = doc(db, "spends", this.editedItem.id);
 
         await updateDoc(ref, this.editedItem);
 
@@ -190,7 +189,7 @@ export default {
       } else {
         // 新增
 
-        const docRef = await addDoc(collection(db, 'spends'), {
+        const docRef = await addDoc(collection(db, "spends"), {
           spend_date: this.editedItem.spend_date,
           cate_name: this.editedItem.cate_name,
           note: this.editedItem.note,
@@ -208,7 +207,7 @@ export default {
     },
     async deleteItem(id, index) {
       if (!confirm("確定刪除")) return;
-      await deleteDoc(doc(db, 'spends', id));
+      await deleteDoc(doc(db, "spends", id));
       this.rows.splice(index, 1);
       this.editedItem = Object.assign({}, this.defaultItem);
       this.editedIndex = -1;
