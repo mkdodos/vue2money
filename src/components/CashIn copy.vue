@@ -9,20 +9,20 @@
           <v-container>
             <v-row>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field label="日期" v-model="editedItem.spend_date" type="date"></v-text-field>
+                <v-text-field label="日期" v-model="editedItem.date" type="date"></v-text-field>
               </v-col>
             </v-row>
 
             <v-row>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field label="項目" v-model="editedItem.note" hide-details="auto"></v-text-field>
+                <v-text-field label="項目" v-model="editedItem.title" hide-details="auto"></v-text-field>
               </v-col>
 
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
                   label="金額"
                   append-icon="mdi-currency-usd"
-                  v-model="editedItem.income"
+                  v-model="editedItem.amt"
                   type="number"
                 ></v-text-field>
               </v-col>
@@ -45,12 +45,8 @@
       </v-card>
     </v-dialog>
     <v-btn @click="openDialog" color="blue-grey" class="white--text">新增</v-btn>
-    <v-data-table
-      :items="rows"
-      :headers="headers"
-      :loading="loading"
-      @click:row="editItem"
-      mobile-breakpoint="300"
+    <v-data-table :items="rows" :headers="headers" :loading="loading"
+    @click:row="editItem" mobile-breakpoint="300"
     ></v-data-table>
   </div>
 </template>
@@ -63,36 +59,33 @@ import {
   addDoc,
   deleteDoc,
   doc,
-  query,
-  getDocs,
+  // query,
+  getDocs
   // limit,
-  where,
-  orderBy
+  // where,
+  // orderBy
 } from "firebase/firestore/lite";
-
-const coll = "spends";
-
 export default {
   data() {
     return {
       // 資料
       rows: [],
       headers: [
-        { text: "日期", value: "spend_date", width: "120" },
-        { text: "項目", value: "note", width: "150" },
-        { text: "金額", value: "income", width: "90" }
+        { text: "日期", value: "date", width: "120" },
+        { text: "項目", value: "title", width: "150" },
+        { text: "金額", value: "amt", width: "90" }
       ],
       loading: false,
       dialog: false,
       defaultItem: {
-        note: "",
-        income: "",
-        spend_date: new Date().toISOString().slice(0, 10)
+        title: "",
+        amt: "",
+        date: new Date().toISOString().slice(0, 10)
       },
       editedItem: {
-        note: "",
-        income: "",
-        spend_date: new Date().toISOString().slice(0, 10)
+        title: "",
+        amt: "",
+        date: new Date().toISOString().slice(0, 10)
       },
       editedIndex: -1
     };
@@ -101,14 +94,14 @@ export default {
     this.getData();
   },
   methods: {
-    editItem(item) {
+     editItem(item) {
       this.dialog = true;
       this.editedIndex = this.rows.indexOf(item);
       this.editedItem = Object.assign({}, item);
     },
     async deleteItem(id, index) {
       if (!confirm("確定刪除")) return;
-      await deleteDoc(doc(db, coll, id));
+      await deleteDoc(doc(db, "cash_in", id));
       this.rows.splice(index, 1);
       this.editedItem = Object.assign({}, this.defaultItem);
       this.editedIndex = -1;
@@ -117,31 +110,23 @@ export default {
     // 合計
     getTotal(arr) {
       let total = Object.keys(arr).reduce(function(previous, key) {
-        return previous + arr[key].income * 1;
+        return previous + arr[key].amt * 1;
       }, 0);
-
+    
       var formatter = new Intl.NumberFormat("en-US", {
         // style: "currency",
         currency: "USD"
       });
 
-      total = formatter.format(total);
+      total = formatter.format(total); 
       return total;
     },
     async getData() {
       this.rows = [];
       this.loading = true;
-      const citiesCol = collection(db, coll);
+      const citiesCol = collection(db, "cash_in");
 
-      const q = query(
-        citiesCol,
-         orderBy("income"),
-       
-        where("income", ">", 0),
-        //  orderBy("spend_date", "desc"),
-      );
-
-      const docSnapBig = await getDocs(q);
+      const docSnapBig = await getDocs(citiesCol);
       docSnapBig.forEach(doc => {
         this.rows.push({ ...doc.data(), id: doc.id });
       });
@@ -157,7 +142,7 @@ export default {
     async save() {
       //更新
       if (this.editedIndex > -1) {
-        const ref = doc(db, coll, this.editedItem.id);
+        const ref = doc(db, "cash_in", this.editedItem.id);
 
         await updateDoc(ref, this.editedItem);
 
@@ -170,15 +155,15 @@ export default {
           // this.defaultItem.date = "";
           this.editedItem = Object.assign({}, this.defaultItem);
           this.editedIndex = -1;
-           
         });
       } else {
         // 新增
-console.log(this.editedItem);
-        const docRef = await addDoc(collection(db, coll), {
-          spend_date: this.editedItem.spend_date,
-          note: this.editedItem.note,
-          income: this.editedItem.income*1
+
+        const docRef = await addDoc(collection(db, "cash_in"), {
+          spend_date: this.editedItem.date,
+         
+          title: this.editedItem.title,
+          amt: this.editedItem.amt
         });
 
         // 設定新增後取得的 id, 才可馬上做編輯
