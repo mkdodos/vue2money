@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-chip class="ma-2">{{ getTotal(rows) }}</v-chip>
+    <v-chip class="ma-2" color="orange" outlined>{{ getTotal(rows) }}</v-chip>
     <!-- 輸入表單 -->
     <v-dialog v-model="dialog" width="500">
       <v-card>
@@ -44,7 +44,9 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-col class="text-right">
     <v-btn @click="openDialog" color="blue-grey" class="white--text">新增</v-btn>
+    </v-col>
     <v-data-table
       :items="rows"
       :headers="headers"
@@ -70,7 +72,7 @@ import {
   orderBy
 } from "firebase/firestore/lite";
 
-const coll = "spends";
+const coll = "incomes";
 
 export default {
   data() {

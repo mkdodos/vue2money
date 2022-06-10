@@ -69,7 +69,7 @@
       <v-col cols="2"></v-col>
       <!-- 合計 -->
       <v-col cols="8" class="text-right">
-        <v-chip class="ma-2">{{ getTotal(rows) }}</v-chip>
+        <v-chip class="ma-2" color="green"  outlined  label>{{ getTotal(rows) }}</v-chip>
       </v-col>
     </v-row>
     <!-- <v-row> -->
@@ -226,30 +226,30 @@ export default {
       // 依年查詢
       let q = query(
         citiesCol,
-        orderBy("expense", "desc"),
-        // orderBy("spend_date", "desc"),
-        // where("spend_date", ">=", this.search.y + "-01-01"),
-        // where("spend_date", "<=", this.search.y + "-12-31"),
-        where('expense','!=',false),
+        // orderBy("expense", "desc"),
+        orderBy("spend_date", "desc"),
+        where("spend_date", ">=", this.search.y + "-01-01"),
+        where("spend_date", "<=", this.search.y + "-12-31"),
+        // where('expense','!=',false),
         limit(10)
       );
       // 依年月查詢 (有選擇月)
       if (this.search.m != "00")
         q = query(
           citiesCol,
-          // orderBy("spend_date", "desc"),
-          // where(
-          //   "spend_date",
-          //   ">=",
-          //   this.search.y + "-" + this.search.m + "-01"
-          // ),
-          // where(
-          //   "spend_date",
-          //   "<=",
-          //   this.search.y + "-" + this.search.m + "-31"
-          // ),
+          orderBy("spend_date", "desc"),
+          where(
+            "spend_date",
+            ">=",
+            this.search.y + "-" + this.search.m + "-01"
+          ),
+          where(
+            "spend_date",
+            "<=",
+            this.search.y + "-" + this.search.m + "-31"
+          ),
           //  orderBy("expense", "desc"),
-          where('expense','!=',false),
+          // where('expense','!=',false),
           limit(10)
         );
       const docSnapBig = await getDocs(q);
