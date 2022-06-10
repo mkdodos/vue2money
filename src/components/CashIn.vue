@@ -135,9 +135,9 @@ export default {
 
       const q = query(
         citiesCol,
-         orderBy("income"),
-       
-        where("income", ">", 0),
+        where("income", "!=", 0),
+        orderBy("income"),
+        // where("income", ">", 0)
         //  orderBy("spend_date", "desc"),
       );
 
@@ -159,7 +159,13 @@ export default {
       if (this.editedIndex > -1) {
         const ref = doc(db, coll, this.editedItem.id);
 
-        await updateDoc(ref, this.editedItem);
+        let row = {
+          spend_date: this.editedItem.spend_date,
+          note: this.editedItem.note,
+          // *1 讓字串變數值和原本 mysql 資料格式相同,之後才可一起做查詢統計
+          income: this.editedItem.income * 1
+        };
+        await updateDoc(ref, row);
 
         // Object.assign(target, ...sources)
         // 將表單的值傳回表格中
@@ -170,15 +176,15 @@ export default {
           // this.defaultItem.date = "";
           this.editedItem = Object.assign({}, this.defaultItem);
           this.editedIndex = -1;
-           
         });
       } else {
         // 新增
-console.log(this.editedItem);
+        console.log(this.editedItem);
         const docRef = await addDoc(collection(db, coll), {
           spend_date: this.editedItem.spend_date,
           note: this.editedItem.note,
-          income: this.editedItem.income*1
+          // *1 讓字串變數值和原本 mysql 資料格式相同,之後才可一起做查詢統計
+          income: this.editedItem.income * 1
         });
 
         // 設定新增後取得的 id, 才可馬上做編輯
