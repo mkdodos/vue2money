@@ -91,6 +91,9 @@
 </template>
 
 <script>
+
+const collection_name = "expenses";
+
 import db from "../db.js";
 import {
   collection,
@@ -175,7 +178,7 @@ export default {
     async save() {
       //更新
       if (this.editedIndex > -1) {
-        const ref = doc(db, "spends", this.editedItem.id);
+        const ref = doc(db, collection_name, this.editedItem.id);
 
         await updateDoc(ref, this.editedItem);
 
@@ -192,7 +195,7 @@ export default {
       } else {
         // 新增
 
-        const docRef = await addDoc(collection(db, "spends"), {
+        const docRef = await addDoc(collection(db, collection_name), {
           spend_date: this.editedItem.spend_date,
           cate_name: this.editedItem.cate_name,
           note: this.editedItem.note,
@@ -210,7 +213,7 @@ export default {
     },
     async deleteItem(id, index) {
       if (!confirm("確定刪除")) return;
-      await deleteDoc(doc(db, "spends", id));
+      await deleteDoc(doc(db, collection_name, id));
       this.rows.splice(index, 1);
       this.editedItem = Object.assign({}, this.defaultItem);
       this.editedIndex = -1;
@@ -219,7 +222,7 @@ export default {
     async getDataYM() {
       this.rows = [];
       this.loading = true;
-      const citiesCol = collection(db, "spends");
+      const citiesCol = collection(db, collection_name);
       // 依年查詢
       let q = query(
         citiesCol,
