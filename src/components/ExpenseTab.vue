@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 輸入表單 -->
+    <!-- 編輯表單 -->
     <v-dialog v-model="dialog" width="500">
       <v-card>
         <v-card-title class="text-h5 lighten-2">編輯</v-card-title>
@@ -47,6 +47,7 @@
       </v-card>
     </v-dialog>
 
+<!-- 查詢 -->
     <v-row>
       <v-col>
         <v-text-field type="number" v-model="search.y" label="年"></v-text-field>
@@ -58,6 +59,14 @@
       <v-col>
         <v-btn @click="getDataYM">查詢</v-btn>
       </v-col>
+      <v-col>
+                <v-select label="分類" :items="cates" v-model="search.cate_name"></v-select>
+              </v-col>
+
+               <v-col>
+        <v-btn @click="getDataByCate">分類查詢</v-btn>
+      </v-col>
+     
     </v-row>
     <v-row>
       <v-col>
@@ -82,6 +91,7 @@
           :items="rows"
           :search="search.keyword"
           :loading="loading"
+          items-per-page=100
         >
         <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
         </v-data-table>
@@ -121,14 +131,16 @@ export default {
       // 查詢預設當年月
       search: { y: new Date().getFullYear(), m: new Date().getMonth() + 1 },
       months: [],
-      cates: ["餐費", "加油", "水電"],
+      accounts: ["現金", "信用卡"],
+      cates: ["餐費", "加油","旅遊", "水電"],
       // 資料
       rows: [],
       headers: [
         // { text: "帳戶", value: "account", width: "100" },
         // { text: "cate", value: "cate", width: "100" },
-        // { text: "類別", value: "cate_name", width: "60" },
         { text: "日期", value: "spend_date", width: "70" },
+       { text: "類別", value: "cate_name", width: "60" },
+       
         { text: "項目", value: "note", width: "120" },
         // { text: "收入", value: "income", width: "90" },
         { text: "支出", value: "expense", width: "70" }
@@ -219,7 +231,30 @@ export default {
       this.editedIndex = -1;
       this.dialog = false;
     },
-    async getDataYM() {
+   
+    async getDataByCate() {
+      this.rows = [];
+      this.loading = true;
+      const citiesCol = collection(db, collection_name);
+      
+      let q = query(
+        citiesCol,   
+        //  orderBy("spend_date"),    
+        where("cate_name", "==", this.search.cate_name),    
+        limit(100)
+      );
+
+// console.log(this.search.cate_name)
+      const docSnapBig = await getDocs(q);
+      docSnapBig.forEach(doc => {
+        this.rows.push({ ...doc.data(), id: doc.id });
+      });
+      this.loading = false;
+     
+    },
+   
+   
+   async getDataYM() {
       this.rows = [];
       this.loading = true;
       const citiesCol = collection(db, collection_name);
@@ -230,8 +265,9 @@ export default {
         orderBy("spend_date", "desc"),
         where("spend_date", ">=", this.search.y + "-01-01"),
         where("spend_date", "<=", this.search.y + "-12-31"),
+        //  where("cate_name", "==", this.search.cate_name),   
         // where('expense','!=',false),
-        limit(10)
+        limit(100)
       );
       // 依年月查詢 (有選擇月)
       if (this.search.m != "00")
@@ -250,7 +286,7 @@ export default {
           ),
           //  orderBy("expense", "desc"),
           // where('expense','!=',false),
-          limit(10)
+          limit(100)
         );
       const docSnapBig = await getDocs(q);
       docSnapBig.forEach(doc => {
