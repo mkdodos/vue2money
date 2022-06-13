@@ -10,6 +10,10 @@
               <v-col cols="12" sm="6" md="6">
                 <v-text-field label="日期" v-model="editedItem.spend_date" type="date"></v-text-field>
               </v-col>
+           <v-col>
+                <v-select label="帳戶" :items="accounts" v-model="editedItem.account_name"></v-select>
+              </v-col>
+           
               <v-col>
                 <v-select label="分類" 
                 
@@ -132,8 +136,10 @@ export default {
   data() {
     return {
       rows: [],
+       accounts: ["現金", "信用卡"],
       cates: ["餐費", "加油", "水電"],
       headers: [
+        { text: "帳戶", value: "account_name", width: "100" },
         // { text: "日期", value: "spend_date", width: "0" },
         // { text: "類別", value: "cate_name", width: "100" },
         { text: "項目", value: "note", width: "200" },
@@ -273,6 +279,7 @@ export default {
         const docRef = await addDoc(collection(db, collection_name), {
           spend_date: this.editedItem.spend_date,
           cate_name: this.editedItem.cate_name,
+          account_name: this.editedItem.account_name,
           note: this.editedItem.note,
           expense: this.editedItem.expense
         });

@@ -10,7 +10,14 @@
               <v-col cols="12" sm="6" md="6">
                 <v-text-field label="日期" v-model="editedItem.spend_date" type="date"></v-text-field>
               </v-col>
+              
+            </v-row>
+            <v-row>
               <v-col>
+                <v-select label="帳戶" :items="accounts" v-model="editedItem.account_name"></v-select>
+              </v-col>
+
+               <v-col>
                 <v-select label="分類" :items="cates" v-model="editedItem.cate_name"></v-select>
               </v-col>
             </v-row>
@@ -145,9 +152,10 @@ export default {
       // 資料
       rows: [],
       headers: [
-        // { text: "帳戶", value: "account", width: "100" },
-        // { text: "cate", value: "cate", width: "100" },
         { text: "日期", value: "spend_date", width: "70" },
+       { text: "帳戶", value: "account_name", width: "100" },
+        // { text: "cate", value: "cate", width: "100" },
+       
         { text: "類別", value: "cate_name", width: "60" },
 
         { text: "項目", value: "note", width: "120" },
@@ -202,12 +210,17 @@ export default {
       if (this.editedIndex > -1) {
         const ref = doc(db, collection_name, this.editedItem.id);
 
+
+ 
+
+
         await updateDoc(ref, this.editedItem);
 
-        // Object.assign(target, ...sources)
+  // Object.assign(target, ...sources)
         // 將表單的值傳回表格中
-        Object.assign(this.rows[this.editedIndex], this.editedItem);
+        Object.assign(this.rows[this.editedIndex], this.editedItem);     
 
+console.log(this.editedItem)
         this.$nextTick(() => {
           // 將表單的值設成預設值
           this.defaultItem.date = "";
