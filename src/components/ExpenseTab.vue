@@ -98,6 +98,8 @@
       :search="search.keyword"
       :loading="loading"
       :items-per-page="100"
+      :sort-by.sync="sortBy"
+      :sort-desc.sync="sortDesc"
     >
       <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
     </v-data-table>
@@ -125,6 +127,8 @@ import {
 export default {
   data() {
     return {
+      sortBy: "spend_date",
+      sortDesc: true,
       editedIndex: -1,
       dialog: false,
       defaultItem: {
@@ -266,6 +270,7 @@ export default {
       docSnapBig.forEach(doc => {
         this.rows.push({ ...doc.data(), id: doc.id });
       });
+      // this.sortBy='expense'
       this.loading = false;
     },
 
