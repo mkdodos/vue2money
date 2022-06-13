@@ -11,7 +11,10 @@
                 <v-text-field label="日期" v-model="editedItem.spend_date" type="date"></v-text-field>
               </v-col>
               <v-col>
-                <v-select label="分類" :items="cates" v-model="editedItem.cate_name"></v-select>
+                <v-select label="分類" 
+                
+           
+                :items="cates" v-model="editedItem.cate_name"></v-select>
               </v-col>
             </v-row>
 
@@ -114,7 +117,7 @@ import db from "../db.js";
 import {
   collection,
   query,
-  // orderBy,
+  orderBy,
   getDocs,
   where,
   addDoc,
@@ -160,9 +163,25 @@ export default {
   },
   mounted() {
     this.getMoney();
+    this.getCates();
     // console.log(this.rows[0])
   },
   methods: {
+    async getCates() {
+      this.cates = [];
+      const cates = collection(db, "cates");
+      let q = query(
+        cates,
+         orderBy("prior")       
+      );
+      const docSnapBig = await getDocs(q);
+      docSnapBig.forEach(doc => {
+        // this.cates.push({ ...doc.data(), id: doc.id });
+        this.cates.push(doc.data().name);
+      });
+      console.log(this.cates)
+    },
+
     // 合計
     getTotal(arr) {      
       const total = Object.keys(arr).reduce(function(previous, key) {
