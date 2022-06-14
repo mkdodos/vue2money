@@ -36,8 +36,9 @@
         </v-list>
       </v-menu>
        <v-btn to="/expense" text>支出</v-btn>
-       <v-btn to="/expense/dada" text>支出(宜君)</v-btn>
        <v-btn to="/expense-tab" text>支出明細</v-btn>
+       <v-btn to="/expense/dada" text>支出(宜君)</v-btn>
+     
        <v-btn to="/cash-in" text>Cash In</v-btn>
        <v-btn to="/spend" text>Spend</v-btn>
       <v-btn to="/spend-tab" text>SpendTab</v-btn>

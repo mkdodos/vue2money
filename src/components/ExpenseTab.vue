@@ -65,6 +65,8 @@
       <v-col>
         <v-btn @click="getDataYM">查詢</v-btn>
       </v-col>
+    </v-row>
+    <v-row>
       <v-col>
         <v-select label="帳戶" :items="accounts" v-model="search.account_name"></v-select>
       </v-col>
@@ -91,10 +93,41 @@
     </v-row>
     <!-- 表格 -->
     <v-row>
-      <v-col cols="2"></v-col>
+      <v-col cols="8"></v-col>
       <!-- 合計 -->
-      <v-col cols="8" class="text-right">
-        <v-chip class="ma-2" color="green" outlined label>{{ getTotal(rows) }}</v-chip>
+      <v-col cols="4" >
+         <v-btn
+       outlined
+        color="red"
+        dark
+       
+      >
+        {{ getTotal(rows) }}
+         <!-- <v-icon left>
+        mdi-pencil
+      </v-icon> -->
+        <!-- <v-icon
+          dark
+          left
+          
+        >
+           mdi-arrow-left
+        </v-icon> -->
+      </v-btn>
+<!-- 
+<v-btn
+      tile
+      color="success"
+      outlined
+    >
+      <v-icon left>
+        mdi-pencil
+      </v-icon>
+       {{ getTotal(rows) }}
+    </v-btn> -->
+
+
+        <!-- <v-chip class="ma-2" color="green" outlined label>合計: {{ getTotal(rows) }}</v-chip> -->
       </v-col>
     </v-row>
     <!-- <v-row> -->
@@ -165,10 +198,10 @@ export default {
       rows: [],
       headers: [
         { text: "日期", value: "spend_date", width: "70" },
-        { text: "帳戶", value: "account_name", width: "100" },
-        // { text: "cate", value: "cate", width: "100" },
+        // { text: "帳戶", value: "account_name", width: "100" },
+       
 
-        { text: "類別", value: "cate_name", width: "60" },
+        // { text: "類別", value: "cate_name", width: "60" },
 
         { text: "項目", value: "note", width: "120" },
         // { text: "收入", value: "income", width: "90" },

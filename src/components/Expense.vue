@@ -139,12 +139,12 @@ export default {
        accounts: ["現金", "信用卡"],
       cates: ["餐費", "加油", "水電"],
       headers: [
-        { text: "帳戶", value: "account_name", width: "100" },
+        // { text: "帳戶", value: "account_name", width: "50" },
         // { text: "日期", value: "spend_date", width: "0" },
         // { text: "類別", value: "cate_name", width: "100" },
-        { text: "項目", value: "note", width: "200" },
+        { text: "項目", value: "note", width: "180" },
         // { text: "收入", value: "income" },
-        { text: "金額", value: "expense", width: "90" }
+        { text: "金額", value: "expense", width: "60" }
         // { text: "備註", value: "note_html" },
         // { text: "", value: "actions" }
       ],
