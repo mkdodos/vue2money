@@ -3,6 +3,7 @@ import Login from '../components/Login';
 import Stock from '../components/Stock';
 import Spend from '../components/Spend';
 import Expense from '../components/Expense';
+import ExpenseDada from '../components/ExpenseDada';
 import ExpenseTab from '../components/ExpenseTab';
 import SpendCate from '../components/SpendCate';
 import SpendTab from '../components/SpendTab';
@@ -21,6 +22,7 @@ const router = new VueRouter({
         { name: 'SpendCate', path: '/spend/cate', component: SpendCate },
         { name: 'Spend', path: '/spend', component: Spend },
         { name: 'Expense', path: '/expense', component: Expense },
+        { name: 'ExpenseDada', path: '/expense/dada', component: ExpenseDada },
         { name: 'ExpenseTab', path: '/expense-tab', component: ExpenseTab },
         { name: 'SpendTab', path: '/spend-tab', component: SpendTab },
         { name: 'CashIn', path: '/cash-in', component: CashIn },
