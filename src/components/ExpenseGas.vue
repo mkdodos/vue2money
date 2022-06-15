@@ -1,5 +1,6 @@
 <template>
   <div>
+    202206 加油錢
     <!-- 編輯表單 -->
     <v-dialog v-model="dialog" width="500">
       <v-card>
@@ -66,35 +67,28 @@
         <v-btn @click="getDataYM">查詢</v-btn>
       </v-col>
     </v-row>
-   
+
     <!-- 表格 -->
     <v-row>
       <v-col cols="8"></v-col>
       <!-- 合計 -->
-      <v-col cols="4" >
-         <v-btn
-       outlined
-        color="red"
-        dark
-       
-      >
-        {{ getTotal(rows) }}
-         <!-- <v-icon left>
+      <v-col cols="4">
+        <v-btn outlined color="red" dark>
+          {{ getTotal(rows) }}
+          <!-- <v-icon left>
         mdi-pencil
-      </v-icon> -->
-        <!-- <v-icon
+          </v-icon>-->
+          <!-- <v-icon
           dark
           left
           
         >
            mdi-arrow-left
-        </v-icon> -->
-      </v-btn>
-
-
+          </v-icon>-->
+        </v-btn>
       </v-col>
     </v-row>
-   
+
     <v-data-table
       mobile-breakpoint="300"
       @click:row="editItem"
@@ -161,7 +155,6 @@ export default {
       headers: [
         { text: "日期", value: "spend_date", width: "70" },
         // { text: "帳戶", value: "account_name", width: "100" },
-       
 
         { text: "類別", value: "cate_name", width: "60" },
 
@@ -174,10 +167,10 @@ export default {
     };
   },
   created() {
-    
     this.monthData();
     this.getDataYM();
     this.getCates();
+    this.getTotal2022()
   },
   methods: {
     editItem(item) {
@@ -307,10 +300,30 @@ export default {
       this.loading = false;
     },
 
+    async getTotal2022() {
+      const expense = collection(db, this.title);
+      // 依年查詢
+      let q = query(
+        expense,       
+        orderBy("spend_date", "desc"),
+        where("spend_date", ">=", "2022-01-01"),
+        where("spend_date", "<=", "2022-12-31"),
+        where("cate_name", "==", "加油"),        
+        limit(100)
+      );
+      let total = 0;
+      const docSnapBig = await getDocs(q);
+      docSnapBig.forEach(doc => {
+        total+=doc.data().expense*1
+      });
+
+      console.log(total)
+    },
+
     async getDataYM() {
       this.rows = [];
       this.loading = true;
-     
+
       const citiesCol = collection(db, this.title);
       // 依年查詢
       let q = query(
@@ -319,7 +332,7 @@ export default {
         orderBy("spend_date", "desc"),
         where("spend_date", ">=", this.search.y + "-01-01"),
         where("spend_date", "<=", this.search.y + "-12-31"),
-         where("cate_name", "==", '加油'),
+        where("cate_name", "==", "加油"),
         // where('expense','!=',false),
         limit(100)
       );
@@ -338,7 +351,7 @@ export default {
             "<=",
             this.search.y + "-" + this.search.m + "-31"
           ),
-           where("cate_name", "==", '加油'),
+          where("cate_name", "==", "加油"),
           //  orderBy("expense", "desc"),
           // where('expense','!=',false),
           limit(100)
