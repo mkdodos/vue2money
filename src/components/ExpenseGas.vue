@@ -135,6 +135,7 @@ export default {
   },
   data() {
     return {
+      total: 0,
       sortBy: "spend_date",
       sortDesc: true,
       editedIndex: -1,
@@ -170,7 +171,8 @@ export default {
     this.monthData();
     this.getDataYM();
     this.getCates();
-    this.getTotal2022()
+    console.log(this.getTotal2022())
+    
   },
   methods: {
     editItem(item) {
@@ -178,6 +180,7 @@ export default {
       this.editedIndex = this.rows.indexOf(item);
       this.editedItem = Object.assign({}, item);
     },
+   
     // 合計
     getTotal(arr) {
       let total = Object.keys(arr).reduce(function(previous, key) {
@@ -317,7 +320,7 @@ export default {
         total+=doc.data().expense*1
       });
 
-      console.log(total)
+      return total;
     },
 
     async getDataYM() {
