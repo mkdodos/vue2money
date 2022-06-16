@@ -1,6 +1,6 @@
 <template>
   <div>
-    202206 加油錢
+    <!-- 202206 加油錢 {{ getTotal2022() }} -->
     <!-- 編輯表單 -->
     <v-dialog v-model="dialog" width="500">
       <v-card>
@@ -89,9 +89,19 @@
       </v-col>
     </v-row>
 
+ <v-data-table
+     
+      :headers="headers2022"
+      :items="rowsMonthTotal"
+     
+    >
+    </v-data-table>
+
+
+
     <v-data-table
       mobile-breakpoint="300"
-      @click:row="editItem"
+     
       :headers="headers"
       :items="rows"
       :search="search.keyword"
@@ -136,6 +146,8 @@ export default {
   data() {
     return {
       total: 0,
+      rows2022:[],
+      rowsMonthTotal:[],
       sortBy: "spend_date",
       sortDesc: true,
       editedIndex: -1,
@@ -153,6 +165,11 @@ export default {
       cates: ["餐費", "加油", "旅遊", "水電"],
       // 資料
       rows: [],
+      headers2022: [
+        { text: "年", value: "y", width: "70" },    
+        { text: "月", value: "m", width: "70" },      
+        { text: "支出", value: "amt", width: "70" }
+      ],
       headers: [
         { text: "日期", value: "spend_date", width: "70" },
         // { text: "帳戶", value: "account_name", width: "100" },
@@ -170,15 +187,27 @@ export default {
   created() {
     this.monthData();
     this.getDataYM();
-    this.getCates();
-    console.log(this.getTotal2022())
+    this.getRows2022('2022','03');
+    this.getRows2022('2022','04');
+    this.getRows2022('2022','05');
+    this.getRows2022('2022','06');
+    console.log(this.rowsMonthTotal)
+    // this.getTotal2022(this.rows2022)
+    // this.getCates();
+    // console.log(this.getTotal2022())
+    // console.log(this.rows2022)
     
   },
   methods: {
-    editItem(item) {
-      this.dialog = true;
-      this.editedIndex = this.rows.indexOf(item);
-      this.editedItem = Object.assign({}, item);
+   
+    getTotal2022() {
+      // this.getRows2022('2022','06')
+      let total = 0;
+      // let arr = this.getRows2022(this.get)
+      // this.rows2022.forEach(obj=>{
+      //   total+=obj*1;
+      // })    
+      return total; 
     },
    
     // 合計
@@ -303,24 +332,46 @@ export default {
       this.loading = false;
     },
 
-    async getTotal2022() {
+    async getRows2022(y,m) {
+      
       const expense = collection(db, this.title);
-      // 依年查詢
+      
       let q = query(
         expense,       
         orderBy("spend_date", "desc"),
-        where("spend_date", ">=", "2022-01-01"),
-        where("spend_date", "<=", "2022-12-31"),
+        
+        where("spend_date", ">=",  y + "-" + m + "-01"),
+        where("spend_date", "<=", y + "-" + m + "-31"),
         where("cate_name", "==", "加油"),        
         limit(100)
       );
-      let total = 0;
+      
       const docSnapBig = await getDocs(q);
+      
+      this.rows2022=[]
+      
+      // 取得該月資料
       docSnapBig.forEach(doc => {
-        total+=doc.data().expense*1
-      });
+        this.rows2022.push(doc.data().expense)       
+      });    
 
-      return total;
+      // 月加總
+
+      let total = 0;
+      
+      this.rows2022.forEach(obj=>{
+        total+=obj*1;
+      })    
+// 將各月加總數字放到陣列
+let obj = {};
+obj.y = y;
+obj.m = m;
+obj.amt = total;
+this.rowsMonthTotal.push(obj)
+
+  // console.log(this.rows2022)
+  // console.log(total)
+      
     },
 
     async getDataYM() {
@@ -364,7 +415,7 @@ export default {
         this.rows.push({ ...doc.data(), id: doc.id });
       });
       this.loading = false;
-      console.log(this.rows);
+      // console.log(this.rows);
     }
   }
 };
