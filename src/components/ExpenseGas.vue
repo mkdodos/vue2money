@@ -4,18 +4,18 @@
    
 
     <!-- 查詢 -->
-    <v-row>
+    <!-- <v-row>
       <v-col>
         <v-text-field type="number" v-model="search.y" label="年"></v-text-field>
       </v-col>
       <v-col>
         <v-select :items="months" v-model="search.m"></v-select>
-        <!-- <v-text-field type="number" v-model="search.m" label="月"></v-text-field> -->
+        
       </v-col>
       <v-col>
         <v-btn @click="getDataYM">查詢</v-btn>
       </v-col>
-    </v-row>
+    </v-row> -->
 
     <!-- 表格 -->
     <v-row>
@@ -33,7 +33,10 @@
     :hide-default-footer="true"
     @click:row="showDetail"
      mobile-breakpoint="300"
-    :headers="headers2022" :items="rowsMonthTotal" :sort-by.sync="sortByM">
+    :headers="headers2022" :items="rowsMonthTotal" :sort-by.sync="sortBy"
+     :loading="loading"
+    :sort-desc.sync="sortDesc"
+    >
     
     <template v-slot:item.amt="{ item }">
        <v-btn outlined color="red" dark>
@@ -42,7 +45,7 @@
     </template>
     </v-data-table>
 
-    <v-data-table
+    <!-- <v-data-table
       mobile-breakpoint="300"
       :headers="headers"
       :items="rows"
@@ -53,7 +56,7 @@
       :sort-desc.sync="sortDesc"
     >
       <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
-    </v-data-table>
+    </v-data-table> -->
     <!-- </v-col> -->
     <!-- </v-row> -->
   </div>
@@ -90,8 +93,8 @@ export default {
       total: 0,
       rows2022: [],
       rowsMonthTotal: [],
-      sortBy: "spend_date",
-      sortByM: "m",
+      sortBy: "m",
+      // sortByM: "m",
       sortDesc: true,
       editedIndex: -1,
       dialog: false,
@@ -124,21 +127,23 @@ export default {
   },
   created() {
     this.monthData();
-    this.getDataYM();
+    // this.getDataYM();
+    // this.loading = true
     this.getRows2022("2022", "03");
     this.getRows2022("2022", "04");
     this.getRows2022("2022", "05");
     this.getRows2022("2022", "06");
-    console.log(this.rowsMonthTotal);
+    this.loading = false
+    // console.log(this.rowsMonthTotal);
    
   },
   methods: { 
     showDetail(item) {
-      this.$router.push({ name: 'ExpenseDetail', params: { m: item.m } })
+      this.$router.push({ name: 'ExpenseDetail', params: { y: item.y,m: item.m } })
       // this.$router.push({path: '/expense/detail/:y', params: { y:'2022' }})
       console.log(item)
       this.search.m = item.m
-      this.getDataYM()
+      // this.getDataYM()
     },
     // 合計
     getTotal(arr) {
@@ -263,6 +268,7 @@ export default {
     },
 
     async getRows2022(y, m) {
+      // this.loading = true
       const expense = collection(db, this.title);
 
       let q = query(
@@ -302,49 +308,7 @@ export default {
       // console.log(total)
     },
 
-    async getDataYM() {
-      this.rows = [];
-      this.loading = true;
-
-      const citiesCol = collection(db, this.title);
-      // 依年查詢
-      let q = query(
-        citiesCol,
-        // orderBy("expense", "desc"),
-        orderBy("spend_date", "desc"),
-        where("spend_date", ">=", this.search.y + "-01-01"),
-        where("spend_date", "<=", this.search.y + "-12-31"),
-        where("cate_name", "==", "加油"),
-        // where('expense','!=',false),
-        limit(100)
-      );
-      // 依年月查詢 (有選擇月)
-      if (this.search.m != "00")
-        q = query(
-          citiesCol,
-          orderBy("spend_date", "desc"),
-          where(
-            "spend_date",
-            ">=",
-            this.search.y + "-" + this.search.m + "-01"
-          ),
-          where(
-            "spend_date",
-            "<=",
-            this.search.y + "-" + this.search.m + "-31"
-          ),
-          where("cate_name", "==", "加油"),
-          //  orderBy("expense", "desc"),
-          // where('expense','!=',false),
-          limit(100)
-        );
-      const docSnapBig = await getDocs(q);
-      docSnapBig.forEach(doc => {
-        this.rows.push({ ...doc.data(), id: doc.id });
-      });
-      this.loading = false;
-      // console.log(this.rows);
-    }
+    
   }
 };
 </script>
