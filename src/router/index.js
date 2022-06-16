@@ -3,6 +3,7 @@ import Login from '../components/Login';
 import Stock from '../components/Stock';
 import Spend from '../components/Spend';
 import Expense from '../components/Expense';
+import ExpenseDetail from '../components/ExpenseDetail';
 import ExpenseGas from '../components/ExpenseGas';
 import ExpenseDada from '../components/ExpenseDada';
 import ExpenseTab from '../components/ExpenseTab';
@@ -23,6 +24,7 @@ const router = new VueRouter({
         { name: 'SpendCate', path: '/spend/cate', component: SpendCate },
         { name: 'Spend', path: '/spend', component: Spend },
         { name: 'Expense', path: '/expense', component: Expense },
+        { name: 'ExpenseDetail', path: '/expense/detail', component: ExpenseDetail },
         { name: 'ExpenseGas', path: '/expense/gas', component: ExpenseGas },
         { name: 'ExpenseDada', path: '/expense/dada', component: ExpenseDada },
         { name: 'ExpenseTab', path: '/expense-tab', component: ExpenseTab },

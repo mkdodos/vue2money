@@ -63,7 +63,7 @@
 // const collection_name = this.title;
 
 const collection_name = "expenses";
-
+// import router from '../router/index';
 import db from "../db.js";
 import {
   collection,
@@ -134,6 +134,8 @@ export default {
   },
   methods: { 
     showDetail(item) {
+      this.$router.push({ name: 'ExpenseDetail', params: { m: item.m } })
+      // this.$router.push({path: '/expense/detail/:y', params: { y:'2022' }})
       console.log(item)
       this.search.m = item.m
       this.getDataYM()
