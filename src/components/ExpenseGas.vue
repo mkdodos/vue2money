@@ -1,58 +1,7 @@
 <template>
   <div>
     <!-- 202206 加油錢 {{ getTotal2022() }} -->
-    <!-- 編輯表單 -->
-    <v-dialog v-model="dialog" width="500">
-      <v-card>
-        <v-card-title class="text-h5 lighten-2">編輯</v-card-title>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col cols="12" sm="6" md="6">
-                <v-text-field label="日期" v-model="editedItem.spend_date" type="date"></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-select label="帳戶" :items="accounts" v-model="editedItem.account_name"></v-select>
-              </v-col>
-
-              <v-col>
-                <v-select label="分類" :items="cates" v-model="editedItem.cate_name"></v-select>
-              </v-col>
-            </v-row>
-
-            <v-row>
-              <v-col cols="12" sm="6" md="6">
-                <v-text-field label="項目" v-model="editedItem.note" hide-details="auto"></v-text-field>
-              </v-col>
-
-              <v-col cols="12" sm="6" md="6">
-                <v-text-field
-                  label="金額"
-                  append-icon="mdi-currency-usd"
-                  v-model="editedItem.expense"
-                  type="number"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-container>
-          <v-row class="mb-6">
-            <v-col class="text-left">
-              <!-- 刪除鈕 -->
-              <v-icon
-                v-if="editedIndex>-1"
-                small
-                @click="deleteItem(editedItem.id,editedIndex)"
-              >mdi-delete</v-icon>
-            </v-col>
-            <v-col class="text-right">
-              <v-btn color="green" class="white--text" @click="save">儲存</v-btn>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+   
 
     <!-- 查詢 -->
     <v-row>
@@ -72,36 +21,29 @@
     <v-row>
       <v-col cols="8"></v-col>
       <!-- 合計 -->
-      <v-col cols="4">
+      <!-- <v-col cols="4">
         <v-btn outlined color="red" dark>
           {{ getTotal(rows) }}
-          <!-- <v-icon left>
-        mdi-pencil
-          </v-icon>-->
-          <!-- <v-icon
-          dark
-          left
-          
-        >
-           mdi-arrow-left
-          </v-icon>-->
+         
         </v-btn>
-      </v-col>
+      </v-col> -->
     </v-row>
 
- <v-data-table
-     
-      :headers="headers2022"
-      :items="rowsMonthTotal"
-     
-    >
+    <v-data-table 
+    :hide-default-footer="true"
+    @click:row="showDetail"
+     mobile-breakpoint="300"
+    :headers="headers2022" :items="rowsMonthTotal" :sort-by.sync="sortByM">
+    
+    <template v-slot:item.amt="{ item }">
+       <v-btn outlined color="red" dark>
+          {{ item.amt }}         
+        </v-btn>
+    </template>
     </v-data-table>
-
-
 
     <v-data-table
       mobile-breakpoint="300"
-     
       :headers="headers"
       :items="rows"
       :search="search.keyword"
@@ -146,9 +88,10 @@ export default {
   data() {
     return {
       total: 0,
-      rows2022:[],
-      rowsMonthTotal:[],
+      rows2022: [],
+      rowsMonthTotal: [],
       sortBy: "spend_date",
+      sortByM: "m",
       sortDesc: true,
       editedIndex: -1,
       dialog: false,
@@ -162,22 +105,17 @@ export default {
       search: { y: new Date().getFullYear(), m: new Date().getMonth() + 1 },
       months: [],
       accounts: ["", "現金", "信用卡"],
-      cates: ["餐費", "加油", "旅遊", "水電"],
+      // cates: ["餐費", "加油", "旅遊", "水電"],
       // 資料
       rows: [],
       headers2022: [
-        { text: "年", value: "y", width: "70" },    
-        { text: "月", value: "m", width: "70" },      
+        { text: "年", value: "y", width: "70" },
+        { text: "月", value: "m", width: "70" },
         { text: "支出", value: "amt", width: "70" }
       ],
       headers: [
         { text: "日期", value: "spend_date", width: "70" },
-        // { text: "帳戶", value: "account_name", width: "100" },
-
-        { text: "類別", value: "cate_name", width: "60" },
-
         { text: "項目", value: "note", width: "120" },
-        // { text: "收入", value: "income", width: "90" },
         { text: "支出", value: "expense", width: "70" }
       ],
       loading: false
@@ -187,29 +125,19 @@ export default {
   created() {
     this.monthData();
     this.getDataYM();
-    this.getRows2022('2022','03');
-    this.getRows2022('2022','04');
-    this.getRows2022('2022','05');
-    this.getRows2022('2022','06');
-    console.log(this.rowsMonthTotal)
-    // this.getTotal2022(this.rows2022)
-    // this.getCates();
-    // console.log(this.getTotal2022())
-    // console.log(this.rows2022)
-    
+    this.getRows2022("2022", "03");
+    this.getRows2022("2022", "04");
+    this.getRows2022("2022", "05");
+    this.getRows2022("2022", "06");
+    console.log(this.rowsMonthTotal);
+   
   },
-  methods: {
-   
-    getTotal2022() {
-      // this.getRows2022('2022','06')
-      let total = 0;
-      // let arr = this.getRows2022(this.get)
-      // this.rows2022.forEach(obj=>{
-      //   total+=obj*1;
-      // })    
-      return total; 
+  methods: { 
+    showDetail(item) {
+      console.log(item)
+      this.search.m = item.m
+      this.getDataYM()
     },
-   
     // 合計
     getTotal(arr) {
       let total = Object.keys(arr).reduce(function(previous, key) {
@@ -332,46 +260,44 @@ export default {
       this.loading = false;
     },
 
-    async getRows2022(y,m) {
-      
+    async getRows2022(y, m) {
       const expense = collection(db, this.title);
-      
+
       let q = query(
-        expense,       
+        expense,
         orderBy("spend_date", "desc"),
-        
-        where("spend_date", ">=",  y + "-" + m + "-01"),
+
+        where("spend_date", ">=", y + "-" + m + "-01"),
         where("spend_date", "<=", y + "-" + m + "-31"),
-        where("cate_name", "==", "加油"),        
+        where("cate_name", "==", "加油"),
         limit(100)
       );
-      
+
       const docSnapBig = await getDocs(q);
-      
-      this.rows2022=[]
-      
+
+      this.rows2022 = [];
+
       // 取得該月資料
       docSnapBig.forEach(doc => {
-        this.rows2022.push(doc.data().expense)       
-      });    
+        this.rows2022.push(doc.data().expense);
+      });
 
       // 月加總
 
       let total = 0;
-      
-      this.rows2022.forEach(obj=>{
-        total+=obj*1;
-      })    
-// 將各月加總數字放到陣列
-let obj = {};
-obj.y = y;
-obj.m = m;
-obj.amt = total;
-this.rowsMonthTotal.push(obj)
 
-  // console.log(this.rows2022)
-  // console.log(total)
-      
+      this.rows2022.forEach(obj => {
+        total += obj * 1;
+      });
+      // 將各月加總數字放到陣列
+      let obj = {};
+      obj.y = y;
+      obj.m = m;
+      obj.amt = total;
+      this.rowsMonthTotal.push(obj);
+
+      // console.log(this.rows2022)
+      // console.log(total)
     },
 
     async getDataYM() {
