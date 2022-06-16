@@ -1,7 +1,6 @@
 <template>
   <div>
     <!-- 202206 加油錢 {{ getTotal2022() }} -->
-   
 
     <!-- 查詢 -->
     <!-- <v-row>
@@ -15,7 +14,7 @@
       <v-col>
         <v-btn @click="getDataYM">查詢</v-btn>
       </v-col>
-    </v-row> -->
+    </v-row>-->
 
     <!-- 表格 -->
     <v-row>
@@ -26,23 +25,22 @@
           {{ getTotal(rows) }}
          
         </v-btn>
-      </v-col> -->
+      </v-col>-->
     </v-row>
 
-    <v-data-table 
-    :hide-default-footer="true"
-    @click:row="showDetail"
-     mobile-breakpoint="300"
-    :headers="headers2022" :items="rowsMonthTotal" :sort-by.sync="sortBy"
-     :loading="loading"
-    :sort-desc.sync="sortDesc"
+    <v-data-table
+      :hide-default-footer="true"
+      @click:row="showDetail"
+      mobile-breakpoint="300"
+      :headers="headers2022"
+      :items="rowsMonthTotal"
+      :sort-by.sync="sortBy"
+      :loading="loading"
+      :sort-desc.sync="sortDesc"
     >
-    
-    <template v-slot:item.amt="{ item }">
-       <v-btn outlined color="red" dark>
-          {{ item.amt }}         
-        </v-btn>
-    </template>
+      <template v-slot:item.amt="{ item }">
+        <v-btn outlined color="red" dark>{{ item.amt }}</v-btn>
+      </template>
     </v-data-table>
 
     <!-- <v-data-table
@@ -56,7 +54,7 @@
       :sort-desc.sync="sortDesc"
     >
       <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
-    </v-data-table> -->
+    </v-data-table>-->
     <!-- </v-col> -->
     <!-- </v-row> -->
   </div>
@@ -65,15 +63,11 @@
 <script>
 // const collection_name = this.title;
 
-const collection_name = "expenses";
+// const collection_name = "expenses";
 // import router from '../router/index';
 import db from "../db.js";
 import {
   collection,
-  updateDoc,
-  addDoc,
-  deleteDoc,
-  doc,
   query,
   getDocs,
   limit,
@@ -98,12 +92,7 @@ export default {
       sortDesc: true,
       editedIndex: -1,
       dialog: false,
-      defaultItem: {
-        note: "",
-        expense: "",
-        spend_date: new Date().toISOString().slice(0, 10)
-      },
-      editedItem: {},
+
       // 查詢預設當年月
       search: { y: new Date().getFullYear(), m: new Date().getMonth() + 1 },
       months: [],
@@ -126,23 +115,53 @@ export default {
     };
   },
   created() {
-    this.monthData();
-    // this.getDataYM();
+    
+    this.getYearData('2022');
     // this.loading = true
     this.getRows2022("2022", "03");
     this.getRows2022("2022", "04");
     this.getRows2022("2022", "05");
     this.getRows2022("2022", "06");
-    this.loading = false
+    this.loading = false;
     // console.log(this.rowsMonthTotal);
-   
   },
-  methods: { 
+  methods: {
+    // 取得整年加油資料
+    async getYearData(y) {
+      // 集合
+      const expense = collection(db, "expenses");
+      // 限定範圍
+      let q = query(
+        expense,
+        orderBy("spend_date", "desc"),
+        where("spend_date", ">=", y + "-" + "01-01"),
+        where("spend_date", "<=", y + "-" + "12-31"),
+        where("cate_name", "==", "加油"),
+        limit(100)
+      );
+      // 文件
+
+      const docExpense = await getDocs(q);
+      
+      docExpense.forEach(doc => {
+        let row = {};
+        row.date = doc.data().spend_date
+        row.amt = doc.data().expense
+        this.rows.push(row);
+      });
+
+      console.log(this.rows)
+
+
+    },
     showDetail(item) {
-      this.$router.push({ name: 'ExpenseDetail', params: { y: item.y,m: item.m } })
+      this.$router.push({
+        name: "ExpenseDetail",
+        params: { y: item.y, m: item.m }
+      });
       // this.$router.push({path: '/expense/detail/:y', params: { y:'2022' }})
-      console.log(item)
-      this.search.m = item.m
+      console.log(item);
+      this.search.m = item.m;
       // this.getDataYM()
     },
     // 合計
@@ -160,111 +179,6 @@ export default {
       total = formatter.format(total); /* $2,500.00 */
 
       return total;
-    },
-    monthData() {
-      for (let i = 0; i <= 12; i++) {
-        if (i < 10) {
-          i = "0" + i;
-        }
-        this.months.push(i);
-      }
-      let m = new Date().getMonth() + 1;
-      if (m < 10) {
-        m = "0" + m;
-      }
-      this.search.m = m;
-    },
-    async save() {
-      //更新
-      if (this.editedIndex > -1) {
-        const ref = doc(db, collection_name, this.editedItem.id);
-
-        await updateDoc(ref, this.editedItem);
-
-        // Object.assign(target, ...sources)
-        // 將表單的值傳回表格中
-        Object.assign(this.rows[this.editedIndex], this.editedItem);
-
-        console.log(this.editedItem);
-        this.$nextTick(() => {
-          // 將表單的值設成預設值
-          this.defaultItem.date = "";
-          this.editedItem = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-        });
-      } else {
-        // 新增
-
-        const docRef = await addDoc(collection(db, collection_name), {
-          spend_date: this.editedItem.spend_date,
-          cate_name: this.editedItem.cate_name,
-          note: this.editedItem.note,
-          expense: this.editedItem.expense
-        });
-
-        // 設定新增後取得的 id, 才可馬上做編輯
-        this.editedItem.id = docRef.id;
-        // 將項目加入到資料列
-        this.rows.unshift(this.editedItem);
-        // console.log(this.rows);
-      }
-
-      this.dialog = false;
-    },
-    async deleteItem(id, index) {
-      if (!confirm("確定刪除")) return;
-      await deleteDoc(doc(db, collection_name, id));
-      this.rows.splice(index, 1);
-      this.editedItem = Object.assign({}, this.defaultItem);
-      this.editedIndex = -1;
-      this.dialog = false;
-    },
-
-    async getCates() {
-      this.cates = [];
-      const cates = collection(db, "cates");
-      let q = query(cates, orderBy("prior"));
-      const docSnapBig = await getDocs(q);
-      docSnapBig.forEach(doc => {
-        this.cates.push(doc.data().name);
-      });
-      console.log(this.cates);
-    },
-
-    async getDataByCate() {
-      this.rows = [];
-      this.loading = true;
-      const citiesCol = collection(db, collection_name);
-      // 分類查詢
-      let q = query(
-        citiesCol,
-        //  orderBy("spend_date"),
-        where("cate_name", "==", this.search.cate_name),
-
-        limit(100)
-      );
-      // console.log(this.search.account_name);
-      // 如果有選帳戶,再加入帳戶條件查詢
-      if (
-        this.search.account_name != "" &&
-        this.search.account_name != undefined
-      ) {
-        q = query(
-          citiesCol,
-          //  orderBy("spend_date"),
-          where("cate_name", "==", this.search.cate_name),
-          where("account_name", "==", this.search.account_name),
-          limit(100)
-        );
-      }
-
-      // console.log(this.search.cate_name)
-      const docSnapBig = await getDocs(q);
-      docSnapBig.forEach(doc => {
-        this.rows.push({ ...doc.data(), id: doc.id });
-      });
-      // this.sortBy='expense'
-      this.loading = false;
     },
 
     async getRows2022(y, m) {
@@ -306,9 +220,7 @@ export default {
 
       // console.log(this.rows2022)
       // console.log(total)
-    },
-
-    
+    }
   }
 };
 </script>
