@@ -61,7 +61,7 @@ export default {
   },
   created() {
     this.getDataYM()
-    console.log(this.$route.params.m);
+    // console.log(this.$route.params.m);
   },
   methods: {
     goBack() {
@@ -71,18 +71,21 @@ export default {
       this.rows = [];
       // this.loading = true;
       const citiesCol = collection(db, 'expenses');
+      // if(this.$route.params.m==undefined)
+      console.log(this.$route.params.y)
       // 依年查詢
-      // let q = query(
-      //   citiesCol,
-      //   orderBy("spend_date", "desc"),
-      //   where("spend_date", ">=", this.search.y + "-01-01"),
-      //   where("spend_date", "<=", this.search.y + "-12-31"),
-      //   where("cate_name", "==", "加油"),
-      //   limit(100)
-      // );
+      let q = query(
+        citiesCol,
+        orderBy("spend_date", "desc"),
+        where("spend_date", ">=", this.$route.params.y + "-01-01"),
+        where("spend_date", "<=", this.$route.params.y + "-12-31"),
+        where("cate_name", "==", "加油"),
+        limit(100)
+      );
       // 依年月查詢 (有選擇月)
       // if (this.search.m != "00")
-      let q = query(
+      if(this.$route.params.m!=undefined)
+       q = query(
           citiesCol,
           orderBy("spend_date", "desc"),
           where(

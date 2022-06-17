@@ -22,9 +22,9 @@
       <!-- 合計 -->
       <v-col cols="6"></v-col>
       <v-col cols="6">
-        <v-btn  color="orange" dark>
+        <v-btn @click="showDetailY" color="orange" dark>
          
-          <v-icon
+          <v-icon 
           dark
           left
         >
@@ -207,6 +207,14 @@ export default {
       console.log(item);
       this.search.m = item.m;
       // this.getDataYM()
+    },
+    showDetailY(item) {
+      this.$router.push({
+        name: "ExpenseDetail",
+        params: { y: '2022' }
+      });         
+      this.search.m = item.m;
+      
     },
     // 合計
     getTotal(arr) {
