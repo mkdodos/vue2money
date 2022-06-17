@@ -18,17 +18,25 @@
     
     <!-- 表格 -->
     <v-row>
-      <v-col cols="8"></v-col>
+      
       <!-- 合計 -->
-      <!-- <v-col cols="4">
-        <v-btn outlined color="red" dark>
-          {{ getTotal(rows) }}
+      <v-col cols="6"></v-col>
+      <v-col cols="6">
+        <v-btn  color="orange" dark>
          
+          <v-icon
+          dark
+          left
+        >
+          mdi-currency-usd
+        </v-icon> {{ yearTotal }}
         </v-btn>
-      </v-col>-->
+      </v-col>
     </v-row>
 
-    <v-data-table
+    <v-row>
+      <v-col cols="12">
+          <v-data-table
       :hide-default-footer="true"
       :items-per-page="100"
       @click:row="showDetail"
@@ -44,6 +52,12 @@
       </template>
     </v-data-table>
 
+      </v-col>
+     
+     
+    </v-row>
+
+  
     <!-- <v-data-table
       mobile-breakpoint="300"
       :headers="headers"
@@ -85,7 +99,7 @@ export default {
   },
   data() {
     return {
-      total: 0,
+      yearTotal: 0,
       rows2022: [],
       rowsYM: [],
       rowsMonthTotal: [],
@@ -119,21 +133,15 @@ export default {
   created() {
     this.getYearData("2022");
 
-    this.getRows2022("2022", "03");
-    this.getRows2022("2022", "04");
-    this.getRows2022("2022", "05");
-    this.getRows2022("2022", "06");
+    // this.getRows2022("2022", "03");
+    // this.getRows2022("2022", "04");
+    // this.getRows2022("2022", "05");
+    // this.getRows2022("2022", "06");
     this.loading = false;
     // console.log(this.rowsMonthTotal);
   },
   methods: {
-    queryRows() {
-      let filter_rows = this.rows.filter(row => row.date.includes("2022-05"));
-      // this.rows.filter(row=>row.note.includes(this.search))
-      console.log(this.rows);
-      console.log(filter_rows);
-      console.log("q");
-    },
+    
 
     // 取得整年加油資料
     async getYearData(y) {
@@ -170,8 +178,11 @@ export default {
         filter_rows = this.rows.filter(element => element.date.includes(ym));
         let total = 0;
         filter_rows.forEach(row => {
-          total += row.amt * 1;
+          // 月合計
+          total += row.amt * 1;          
         });
+        // 年合計
+        this.yearTotal += total
         console.log(total);
         let obj = {};
         obj.y = y;

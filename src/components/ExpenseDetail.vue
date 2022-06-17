@@ -1,7 +1,26 @@
 <template>
   <div>
-    <v-btn @click="goBack">返回</v-btn>
+   
+      <v-row class="mt-2">
+        <!-- <v-icon @click="goBack" right >mdi-arrow-left</v-icon> -->
+        <v-btn
+        @click="goBack"
+        class="ma-2"
+        color="orange darken-2"
+        dark
+      >
+        <v-icon
+          dark
+          left
+        >
+          mdi-arrow-left
+        </v-icon>Back
+      </v-btn>
+      </v-row>
+      
+     
     <!-- {{$route.params.m}} -->
+    <v-row class="mt-3">
      <v-data-table
       mobile-breakpoint="300"
       :headers="headers"
@@ -13,7 +32,7 @@
     >
       <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
     </v-data-table>
-    
+    </v-row>
     </div>
 
 </template>
