@@ -15,7 +15,7 @@
         <v-btn @click="getDataYM">查詢</v-btn>
       </v-col>
     </v-row>-->
-
+    
     <!-- 表格 -->
     <v-row>
       <v-col cols="8"></v-col>
@@ -30,11 +30,12 @@
 
     <v-data-table
       :hide-default-footer="true"
+      :items-per-page="100"
       @click:row="showDetail"
       mobile-breakpoint="300"
       :headers="headers2022"
-      :items="rowsMonthTotal"
-      :sort-by.sync="sortBy"
+      :items="rowsYM"
+     
       :loading="loading"
       :sort-desc.sync="sortDesc"
     >
@@ -86,6 +87,7 @@ export default {
     return {
       total: 0,
       rows2022: [],
+      rowsYM: [],
       rowsMonthTotal: [],
       sortBy: "m",
       // sortByM: "m",
@@ -105,19 +107,18 @@ export default {
         { text: "月", value: "m", width: "70" },
         { text: "支出", value: "amt", width: "70" }
       ],
-      headers: [
-        { text: "日期", value: "spend_date", width: "70" },
-        { text: "項目", value: "note", width: "120" },
-        { text: "支出", value: "expense", width: "70" }
-      ],
+      // headers: [
+      //   { text: "日期", value: "spend_date", width: "70" },
+      //   { text: "項目", value: "note", width: "120" },
+      //   { text: "支出", value: "expense", width: "70" }
+      // ],
       loading: false
       // title:'expenses'
     };
   },
   created() {
-    
-    this.getYearData('2022');
-    // this.loading = true
+    this.getYearData("2022");
+
     this.getRows2022("2022", "03");
     this.getRows2022("2022", "04");
     this.getRows2022("2022", "05");
@@ -126,6 +127,14 @@ export default {
     // console.log(this.rowsMonthTotal);
   },
   methods: {
+    queryRows() {
+      let filter_rows = this.rows.filter(row => row.date.includes("2022-05"));
+      // this.rows.filter(row=>row.note.includes(this.search))
+      console.log(this.rows);
+      console.log(filter_rows);
+      console.log("q");
+    },
+
     // 取得整年加油資料
     async getYearData(y) {
       // 集合
@@ -140,19 +149,43 @@ export default {
         limit(100)
       );
       // 文件
-
       const docExpense = await getDocs(q);
-      
+
       docExpense.forEach(doc => {
         let row = {};
-        row.date = doc.data().spend_date
-        row.amt = doc.data().expense
+        row.date = doc.data().spend_date;
+        row.amt = doc.data().expense;
         this.rows.push(row);
+        // 可用簡化寫法 ... 展開 doc.data() 的 key-value
+        // this.rows.push({...doc.data()});
       });
 
-      console.log(this.rows)
+      // 篩選月資料並加總
+      let filter_rows = [];
+      for (let i = 1; i <= 12; i++) {
+        if (i < 10) {
+          i = "0" + i;
+        }
+        let ym = y + "-" + i;
+        filter_rows = this.rows.filter(element => element.date.includes(ym));
+        let total = 0;
+        filter_rows.forEach(row => {
+          total += row.amt * 1;
+        });
+        console.log(total);
+        let obj = {};
+        obj.y = y;
+        obj.m = i;
+        obj.amt = total;
+        if(total>0)
+        this.rowsYM.push(obj);
+      }
 
+      // filter_rows = this.rows.filter(element =>
+      //   element.date.includes("2022-05")
+      // );
 
+      // console.log(filter_rows);
     },
     showDetail(item) {
       this.$router.push({
