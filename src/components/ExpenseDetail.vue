@@ -9,7 +9,7 @@
 
     <!-- 編輯表單 -->
     <v-row>
-       <v-col>
+      <v-col>
         <v-text-field label="項目" v-model="editedRow.note"></v-text-field>
       </v-col>
       <v-col>
@@ -22,26 +22,43 @@
         <v-text-field type="number" label="qty" v-model="editedRow.qty"></v-text-field>
       </v-col>
       <v-col>
-        <v-btn @click="save" class="ma-2" color="darken-2" dark>
-          Save
-        </v-btn>
+        <v-btn @click="save" class="ma-2" color="darken-2" dark>Save</v-btn>
       </v-col>
     </v-row>
 
     <!-- 資料表格 -->
     <v-row class="mt-3">
       <v-col>
- <v-data-table
-        mobile-breakpoint="300"
-        :headers="headers"
-        :items="rows"
-        @click:row="editItem"
-        :items-per-page="100"
-      >
-        <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
-      </v-data-table>
+        <v-data-table
+          mobile-breakpoint="300"
+          :headers="headers"
+          :items="rows"
+          @click:row="editItem"
+          :items-per-page="100"
+        >
+          <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
+        </v-data-table>
       </v-col>
-     
+      <v-col>
+        <v-timeline v-for="(item, index) in rows" v-bind:key="index" align-top dense>
+          <v-timeline-item  color="pink" small>
+            <v-row class="pt-1">
+              <v-col cols="3">
+                <strong>{{ item.km }} KM</strong> 
+              </v-col>
+             
+            </v-row>
+          </v-timeline-item>
+          <!-- <v-timeline-item small>
+            <v-row class="pt-1">
+              <v-col cols="3">
+                <strong>3-4pm</strong>
+              </v-col>              
+            </v-row>
+          </v-timeline-item> -->
+         
+        </v-timeline>
+      </v-col>
     </v-row>
   </div>
 </template>
@@ -65,7 +82,7 @@ export default {
       headers: [
         { text: "日期", value: "spend_date", width: "70" },
         { text: "項目", value: "note", width: "80" },
-        { text: "里程", value: "km", width: "50" },
+        // { text: "里程", value: "km", width: "50" },
         { text: "單價$", value: "price", width: "60" },
         { text: "公升", value: "qty", width: "20" },
         { text: "支出", value: "expense", width: "70" }
@@ -83,21 +100,21 @@ export default {
     editItem(item) {
       this.editedIndex = this.rows.indexOf(item);
       this.editedRow = Object.assign({}, item);
-     
+
       console.log(item);
     },
     async save() {
       const docRef = doc(db, "expenses", this.editedRow.id);
       await updateDoc(docRef, this.editedRow);
       // 將表單的值傳回表格中
-        Object.assign(this.rows[this.editedIndex], this.editedRow);
+      Object.assign(this.rows[this.editedIndex], this.editedRow);
 
-        this.$nextTick(() => {
-          // 將表單的值設成預設值
-          
-          this.editedRow = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-        });
+      this.$nextTick(() => {
+        // 將表單的值設成預設值
+
+        this.editedRow = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
     },
     goBack() {
       this.$router.go(-1);
