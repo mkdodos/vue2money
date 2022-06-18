@@ -16,11 +16,13 @@
 <script>
 // import HelloWorld from './components/HelloWorld';
 import Toolbar from "./components/Toolbar";
+// import BarChart from './components/BarChart'
 export default {
   name: "App",
 
   components: {
-    Toolbar
+    Toolbar,
+    // BarChart
   },
 
   data: () => ({

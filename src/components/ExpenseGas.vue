@@ -47,20 +47,11 @@
       </v-col>
     </v-row>
 
-    <!-- <v-data-table
-      mobile-breakpoint="300"
-      :headers="headers"
-      :items="rows"
-      :search="search.keyword"
-      :loading="loading"
-      :items-per-page="100"
-      :sort-by.sync="sortBy"
-      :sort-desc.sync="sortDesc"
-    >
-      <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
-    </v-data-table>-->
-    <!-- </v-col> -->
-    <!-- </v-row> -->
+    <v-row>
+      <v-col cols="6">
+      <BarChart />
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -70,6 +61,8 @@
 // const collection_name = "expenses";
 // import router from '../router/index';
 import db from "../db.js";
+import BarChart from '../components/BarChart'
+// import Chart from "chart.js";
 import {
   collection,
   query,
@@ -79,6 +72,7 @@ import {
   orderBy
 } from "firebase/firestore/lite";
 export default {
+  components: { BarChart },
   // props: ["title", "text"],
   props: {
     title: {
@@ -122,7 +116,7 @@ export default {
   },
   created() {
     this.getYearData("2022");
-
+    // this.getChart();
     // this.getRows2022("2022", "03");
     // this.getRows2022("2022", "04");
     // this.getRows2022("2022", "05");
@@ -131,6 +125,7 @@ export default {
     // console.log(this.rowsMonthTotal);
   },
   methods: {
+  
     // 取得整年加油資料
     async getYearData(y) {
       // 集合
@@ -178,12 +173,12 @@ export default {
           }
         });
 
-// console.log(filter_rows) //8503
+        // console.log(filter_rows) //8503
         for (let i = 0; i < filter_rows.length - 1; i++) {
-          if (filter_rows[i].km != undefined ) {
+          if (filter_rows[i].km != undefined) {
             // console.log(filter_rows[i].km) //8503 8090
             // console.log(filter_rows[i+1].km) //8090
-             total_km += filter_rows[i].km - filter_rows[i + 1].km;
+            total_km += filter_rows[i].km - filter_rows[i + 1].km;
             // console.log(filter_rows[i].km - filter_rows[i + 1].km);
           }
         }
