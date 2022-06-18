@@ -22,8 +22,8 @@
         <v-text-field type="number" label="qty" v-model="editedRow.qty"></v-text-field>
       </v-col>
       <v-col>
-        <v-btn @click="save" class="ma-2" color="orange darken-2" dark>
-          <v-icon dark left>mdi-arrow-left</v-icon>Save
+        <v-btn @click="save" class="ma-2" color="darken-2" dark>
+          Save
         </v-btn>
       </v-col>
     </v-row>

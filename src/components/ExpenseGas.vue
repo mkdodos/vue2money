@@ -15,49 +15,38 @@
         <v-btn @click="getDataYM">查詢</v-btn>
       </v-col>
     </v-row>-->
-    
+
     <!-- 表格 -->
     <v-row>
-      
       <!-- 合計 -->
       <v-col cols="6"></v-col>
       <v-col cols="6">
         <v-btn @click="showDetailY" color="orange" dark>
-         
-          <v-icon 
-          dark
-          left
-        >
-          mdi-currency-usd
-        </v-icon> {{ yearTotal }}
+          <v-icon dark left>mdi-currency-usd</v-icon>
+          {{ yearTotal }}
         </v-btn>
       </v-col>
     </v-row>
 
     <v-row>
       <v-col cols="12">
-          <v-data-table
-      :hide-default-footer="true"
-      :items-per-page="100"
-      @click:row="showDetail"
-      mobile-breakpoint="300"
-      :headers="headers2022"
-      :items="rowsYM"
-     
-      :loading="loading"
-      :sort-desc.sync="sortDesc"
-    >
-      <template v-slot:item.amt="{ item }">
-        <v-btn outlined color="red" dark>{{ item.amt }}</v-btn>
-      </template>
-    </v-data-table>
-
+        <v-data-table
+          :hide-default-footer="true"
+          :items-per-page="100"
+          @click:row="showDetail"
+          mobile-breakpoint="300"
+          :headers="headers2022"
+          :items="rowsYM"
+          :loading="loading"
+          :sort-desc.sync="sortDesc"
+        >
+          <template v-slot:item.amt="{ item }">
+            <v-btn outlined color="red" dark>{{ item.amt }}</v-btn>
+          </template>
+        </v-data-table>
       </v-col>
-     
-     
     </v-row>
 
-  
     <!-- <v-data-table
       mobile-breakpoint="300"
       :headers="headers"
@@ -119,6 +108,7 @@ export default {
       headers2022: [
         { text: "年", value: "y", width: "70" },
         { text: "月", value: "m", width: "70" },
+        { text: "里程", value: "km", width: "70" },
         { text: "支出", value: "amt", width: "70" }
       ],
       // headers: [
@@ -141,8 +131,6 @@ export default {
     // console.log(this.rowsMonthTotal);
   },
   methods: {
-    
-
     // 取得整年加油資料
     async getYearData(y) {
       // 集合
@@ -163,6 +151,7 @@ export default {
         let row = {};
         row.date = doc.data().spend_date;
         row.amt = doc.data().expense;
+        row.km = doc.data().km;
         this.rows.push(row);
         // 可用簡化寫法 ... 展開 doc.data() 的 key-value
         // this.rows.push({...doc.data()});
@@ -177,19 +166,36 @@ export default {
         let ym = y + "-" + i;
         filter_rows = this.rows.filter(element => element.date.includes(ym));
         let total = 0;
+        let total_km = 0;
         filter_rows.forEach(row => {
           // 月合計
-          total += row.amt * 1;          
+          total += row.amt * 1;
+          // 公里合計
+
+          if (row.km != undefined) {
+            // total_km += row.km * 1;
+            // console.log(row.km)
+          }
         });
+
+// console.log(filter_rows) //8503
+        for (let i = 0; i < filter_rows.length - 1; i++) {
+          if (filter_rows[i].km != undefined ) {
+            // console.log(filter_rows[i].km) //8503 8090
+            // console.log(filter_rows[i+1].km) //8090
+             total_km += filter_rows[i].km - filter_rows[i + 1].km;
+            // console.log(filter_rows[i].km - filter_rows[i + 1].km);
+          }
+        }
         // 年合計
-        this.yearTotal += total
-        console.log(total);
+        this.yearTotal += total;
+        // console.log(total);
         let obj = {};
         obj.y = y;
         obj.m = i;
         obj.amt = total;
-        if(total>0)
-        this.rowsYM.push(obj);
+        obj.km = total_km;
+        if (total > 0) this.rowsYM.push(obj);
       }
 
       // filter_rows = this.rows.filter(element =>
@@ -211,10 +217,9 @@ export default {
     showDetailY(item) {
       this.$router.push({
         name: "ExpenseDetail",
-        params: { y: '2022' }
-      });         
+        params: { y: "2022" }
+      });
       this.search.m = item.m;
-      
     },
     // 合計
     getTotal(arr) {
