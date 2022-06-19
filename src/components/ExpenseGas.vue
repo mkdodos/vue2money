@@ -49,7 +49,7 @@
 
     <v-row>
       <v-col cols="6">
-      <BarChart />
+        <BarChart :chart-data="chartData" />
       </v-col>
     </v-row>
   </div>
@@ -61,7 +61,7 @@
 // const collection_name = "expenses";
 // import router from '../router/index';
 import db from "../db.js";
-import BarChart from '../components/BarChart'
+import BarChart from "../components/BarChart";
 // import Chart from "chart.js";
 import {
   collection,
@@ -82,6 +82,33 @@ export default {
   },
   data() {
     return {
+      chch: [400, 20, 12, 30],
+      chartData: {
+        labels: [],
+        datasets: [
+          {
+            label: "里程",
+            data: [],
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.2)",
+              // "rgba(54, 162, 235, 0.2)",
+              // "rgba(255, 206, 86, 0.2)",
+              // "rgba(75, 192, 192, 0.2)",
+              // "rgba(153, 102, 255, 0.2)",
+              // "rgba(255, 159, 64, 0.2)"
+            ],
+            borderColor: [
+              "rgba(255, 99, 132, 1)",
+              // "rgba(54, 162, 235, 1)",
+              // "rgba(255, 206, 86, 1)",
+              // "rgba(75, 192, 192, 1)",
+              // "rgba(153, 102, 255, 1)",
+              // "rgba(255, 159, 64, 1)"
+            ],
+            borderWidth: 1
+          }
+        ]
+      },
       yearTotal: 0,
       rows2022: [],
       rowsYM: [],
@@ -115,6 +142,7 @@ export default {
     };
   },
   created() {
+    
     this.getYearData("2022");
     // this.getChart();
     // this.getRows2022("2022", "03");
@@ -125,7 +153,6 @@ export default {
     // console.log(this.rowsMonthTotal);
   },
   methods: {
-  
     // 取得整年加油資料
     async getYearData(y) {
       // 集合
@@ -165,21 +192,12 @@ export default {
         filter_rows.forEach(row => {
           // 月合計
           total += row.amt * 1;
-          // 公里合計
-
-          if (row.km != undefined) {
-            // total_km += row.km * 1;
-            // console.log(row.km)
-          }
         });
 
         // console.log(filter_rows) //8503
         for (let i = 0; i < filter_rows.length - 1; i++) {
           if (filter_rows[i].km != undefined) {
-            // console.log(filter_rows[i].km) //8503 8090
-            // console.log(filter_rows[i+1].km) //8090
             total_km += filter_rows[i].km - filter_rows[i + 1].km;
-            // console.log(filter_rows[i].km - filter_rows[i + 1].km);
           }
         }
         // 年合計
@@ -189,8 +207,14 @@ export default {
         obj.y = y;
         obj.m = i;
         obj.amt = total;
+        // 月公里合計
         obj.km = total_km;
-        if (total > 0) this.rowsYM.push(obj);
+        if (total > 0) {
+          this.rowsYM.push(obj);
+          // 圖表資料
+          this.chartData.datasets[0].data.push(total_km);
+          this.chartData.labels.push(i);
+        }
       }
 
       // filter_rows = this.rows.filter(element =>

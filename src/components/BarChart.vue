@@ -49,11 +49,15 @@ export default {
     plugins: {
       type: Object,
       default: () => {}
+    },
+    chartData: {
+      type: Object,
+      default: () => {}
     }
   },
   data() {
     return {
-      chartData: {
+      chartData1: {
         labels: [ 'January', 'February', 'March','april' ],
         datasets: [ { 
            label: '里程',     
