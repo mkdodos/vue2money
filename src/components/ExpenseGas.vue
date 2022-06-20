@@ -106,6 +106,28 @@ export default {
               // "rgba(255, 159, 64, 1)"
             ],
             borderWidth: 1
+          },
+          // 第二組資料(支出)
+          {
+            label:'支出',
+            data:[],
+          backgroundColor: [
+              // "rgba(255, 99, 132, 0.2)",
+              "rgba(54, 162, 235, 0.2)",
+              // "rgba(255, 206, 86, 0.2)",
+              // "rgba(75, 192, 192, 0.2)",
+              // "rgba(153, 102, 255, 0.2)",
+              // "rgba(255, 159, 64, 0.2)"
+            ],
+            borderColor: [
+              // "rgba(255, 99, 132, 1)",
+              "rgba(54, 162, 235, 1)",
+              // "rgba(255, 206, 86, 1)",
+              // "rgba(75, 192, 192, 1)",
+              // "rgba(153, 102, 255, 1)",
+              // "rgba(255, 159, 64, 1)"
+            ],
+            borderWidth: 1
           }
         ]
       },
@@ -209,10 +231,12 @@ export default {
         obj.amt = total;
         // 月公里合計
         obj.km = total_km;
+        
         if (total > 0) {
           this.rowsYM.push(obj);
           // 圖表資料
           this.chartData.datasets[0].data.push(total_km);
+          this.chartData.datasets[1].data.push(total);
           this.chartData.labels.push(i);
         }
       }
