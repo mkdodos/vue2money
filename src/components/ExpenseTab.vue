@@ -87,46 +87,19 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col>
+      <v-col cols="8">
         <v-text-field v-model="search.keyword" append-icon="mdi-magnify"></v-text-field>
+      </v-col>
+      <v-col>
+        <v-btn @click="switchCols">切換欄位</v-btn>
       </v-col>
     </v-row>
     <!-- 表格 -->
     <v-row>
       <v-col cols="8"></v-col>
       <!-- 合計 -->
-      <v-col cols="4" >
-         <v-btn
-       outlined
-        color="red"
-        dark
-       
-      >
-        {{ getTotal(rows) }}
-         <!-- <v-icon left>
-        mdi-pencil
-      </v-icon> -->
-        <!-- <v-icon
-          dark
-          left
-          
-        >
-           mdi-arrow-left
-        </v-icon> -->
-      </v-btn>
-<!-- 
-<v-btn
-      tile
-      color="success"
-      outlined
-    >
-      <v-icon left>
-        mdi-pencil
-      </v-icon>
-       {{ getTotal(rows) }}
-    </v-btn> -->
-
-
+      <v-col cols="4">
+        <v-btn outlined color="red" dark>{{ getTotal(rows) }}</v-btn>
         <!-- <v-chip class="ma-2" color="green" outlined label>合計: {{ getTotal(rows) }}</v-chip> -->
       </v-col>
     </v-row>
@@ -199,7 +172,6 @@ export default {
       headers: [
         { text: "日期", value: "spend_date", width: "70" },
         // { text: "帳戶", value: "account_name", width: "100" },
-       
 
         // { text: "類別", value: "cate_name", width: "60" },
 
@@ -212,12 +184,23 @@ export default {
     };
   },
   created() {
-    console.log(this.title);
+    // console.log(this.title);
     this.monthData();
     this.getDataYM();
     this.getCates();
   },
   methods: {
+    // 切換欄位顯示
+    switchCols() {
+      this.headers.unshift({
+        text: "帳戶",
+        value: "account_name",
+        width: "100"
+      });
+
+      this.headers.unshift({ text: "類別", value: "cate_name", width: "60" });
+      console.log("switch");
+    },
     editItem(item) {
       this.dialog = true;
       this.editedIndex = this.rows.indexOf(item);
@@ -306,43 +289,63 @@ export default {
       docSnapBig.forEach(doc => {
         this.cates.push(doc.data().name);
       });
-      console.log(this.cates);
+      this.cates.unshift("");
+      // console.log(this.cates);
     },
 
     async getDataByCate() {
       this.rows = [];
       this.loading = true;
-      const citiesCol = collection(db, collection_name);
-      // 分類查詢
-      let q = query(
-        citiesCol,
-        //  orderBy("spend_date"),
-        where("cate_name", "==", this.search.cate_name),
+      const citiesRef = collection(db, collection_name);
 
-        limit(100)
-      );
-      // console.log(this.search.account_name);
-      // 如果有選帳戶,再加入帳戶條件查詢
-      if (
-        this.search.account_name != "" &&
-        this.search.account_name != undefined
-      ) {
+      //  分類查詢
+      let q = ""; 
+      // 判斷有無輸入類別帳戶,組合不同條件
+      let cate = this.search.cate_name;
+      let account = this.search.account_name;
+      let cateT = cate != "" && cate != undefined;
+      let accountT = account != "" && account != undefined;
+      // 有選類別,沒選帳戶
+      if (cateT && !accountT) {
+        console.log("cate");
         q = query(
-          citiesCol,
-          //  orderBy("spend_date"),
+          citiesRef,
           where("cate_name", "==", this.search.cate_name),
-          where("account_name", "==", this.search.account_name),
           limit(100)
         );
       }
 
-      // console.log(this.search.cate_name)
+      // 沒選類別,有選帳戶
+      if (!cateT && accountT) {
+        console.log("acc");
+        q = query(
+          citiesRef,
+          where("account_name", "==", this.search.account_name)
+        );
+      }
+      // 二者都選
+      if (cateT && accountT) {        
+        q = query(
+          citiesRef,
+          where("cate_name", "==", this.search.cate_name),
+          where("account_name", "==", this.search.account_name)
+        );
+      }       
+    
+      // 二者都沒選,不做查詢
+      if(!cateT && !accountT){
+         this.loading = false;
+          return 
+      }
+      
+      // 資料 
       const docSnapBig = await getDocs(q);
       docSnapBig.forEach(doc => {
         this.rows.push({ ...doc.data(), id: doc.id });
       });
-      // this.sortBy='expense'
       this.loading = false;
+
+     
     },
 
     async getDataYM() {
@@ -385,7 +388,7 @@ export default {
         this.rows.push({ ...doc.data(), id: doc.id });
       });
       this.loading = false;
-      console.log(this.rows);
+      // console.log(this.rows);
     }
   }
 };
