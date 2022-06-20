@@ -10,15 +10,12 @@
               <v-col cols="12" sm="6" md="6">
                 <v-text-field label="日期" v-model="editedItem.spend_date" type="date"></v-text-field>
               </v-col>
-           <v-col>
+              <v-col>
                 <v-select label="帳戶" :items="accounts" v-model="editedItem.account_name"></v-select>
               </v-col>
-           
+
               <v-col>
-                <v-select label="分類" 
-                
-           
-                :items="cates" v-model="editedItem.cate_name"></v-select>
+                <v-select label="分類" :items="cates" v-model="editedItem.cate_name"></v-select>
               </v-col>
             </v-row>
 
@@ -81,7 +78,7 @@
         <!-- <v-btn @click="openDialog" color="blue-grey" class="ma-2 white--text"> -->
         <v-btn @click="openDialog" color="blue-grey" class="white--text">
           新增
-          <!-- <v-icon>mdi-plus-circle-outline</v-icon> -->
+          
         </v-btn>
       </v-col>
     </v-row>
@@ -136,7 +133,7 @@ export default {
   data() {
     return {
       rows: [],
-       accounts: ["現金", "信用卡"],
+      accounts: ["現金", "信用卡"],
       cates: ["餐費", "加油", "水電"],
       headers: [
         // { text: "帳戶", value: "account_name", width: "50" },
@@ -160,6 +157,8 @@ export default {
       defaultItem: {
         note: "",
         expense: "",
+        account_name:"現金",
+        cate_name:"餐費",
         spend_date: new Date().toISOString().slice(0, 10)
       },
       editedIndex: -1,
@@ -176,20 +175,17 @@ export default {
     async getCates() {
       this.cates = [];
       const cates = collection(db, "cates");
-      let q = query(
-        cates,
-         orderBy("prior")       
-      );
+      let q = query(cates, orderBy("prior"));
       const docSnapBig = await getDocs(q);
       docSnapBig.forEach(doc => {
         // this.cates.push({ ...doc.data(), id: doc.id });
         this.cates.push(doc.data().name);
       });
-      console.log(this.cates)
+      console.log(this.cates);
     },
 
     // 合計
-    getTotal(arr) {      
+    getTotal(arr) {
       const total = Object.keys(arr).reduce(function(previous, key) {
         return previous + arr[key].expense * 1;
       }, 0);

@@ -179,7 +179,8 @@ export default {
         // { text: "收入", value: "income", width: "90" },
         { text: "支出", value: "expense", width: "70" }
       ],
-      loading: false
+      loading: false,
+      switchColsFlag: false,
       // title:'expenses'
     };
   },
@@ -192,13 +193,29 @@ export default {
   methods: {
     // 切換欄位顯示
     switchCols() {
-      this.headers.unshift({
+     
+      let account = {
         text: "帳戶",
         value: "account_name",
         width: "100"
-      });
+      };
+      
+      let cate = { text: "類別", value: "cate_name", width: "60" };
 
-      this.headers.unshift({ text: "類別", value: "cate_name", width: "60" });
+      // this.headers.unshift({ text: "類別", value: "cate_name", width: "60" });
+      if(!this.switchColsFlag){
+ this.headers.splice(0, 0, account);
+      this.headers.splice(0, 0, cate);
+      }else{
+ this.headers.splice(0, 1);
+ this.headers.splice(0, 1);
+      }
+
+       this.switchColsFlag = !this.switchColsFlag
+     
+     
+      
+
       console.log("switch");
     },
     editItem(item) {
@@ -299,7 +316,7 @@ export default {
       const citiesRef = collection(db, collection_name);
 
       //  分類查詢
-      let q = ""; 
+      let q = "";
       // 判斷有無輸入類別帳戶,組合不同條件
       let cate = this.search.cate_name;
       let account = this.search.account_name;
@@ -324,28 +341,26 @@ export default {
         );
       }
       // 二者都選
-      if (cateT && accountT) {        
+      if (cateT && accountT) {
         q = query(
           citiesRef,
           where("cate_name", "==", this.search.cate_name),
           where("account_name", "==", this.search.account_name)
         );
-      }       
-    
-      // 二者都沒選,不做查詢
-      if(!cateT && !accountT){
-         this.loading = false;
-          return 
       }
-      
-      // 資料 
+
+      // 二者都沒選,不做查詢
+      if (!cateT && !accountT) {
+        this.loading = false;
+        return;
+      }
+
+      // 資料
       const docSnapBig = await getDocs(q);
       docSnapBig.forEach(doc => {
         this.rows.push({ ...doc.data(), id: doc.id });
       });
       this.loading = false;
-
-     
     },
 
     async getDataYM() {
