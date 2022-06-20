@@ -65,6 +65,9 @@
       <v-col>
         <v-btn @click="getDataYM">查詢</v-btn>
       </v-col>
+      <v-col>
+        <v-btn @click="getDataYM2">查詢2</v-btn>
+      </v-col>
     </v-row>
     <v-row>
       <v-col>
@@ -180,7 +183,7 @@ export default {
         { text: "支出", value: "expense", width: "70" }
       ],
       loading: false,
-      switchColsFlag: false,
+      switchColsFlag: false
       // title:'expenses'
     };
   },
@@ -193,28 +196,20 @@ export default {
   methods: {
     // 切換欄位顯示
     switchCols() {
-     
-      let account = {
-        text: "帳戶",
-        value: "account_name",
-        width: "100"
-      };
-      
-      let cate = { text: "類別", value: "cate_name", width: "60" };
-
-      // this.headers.unshift({ text: "類別", value: "cate_name", width: "60" });
-      if(!this.switchColsFlag){
- this.headers.splice(0, 0, account);
-      this.headers.splice(0, 0, cate);
-      }else{
- this.headers.splice(0, 1);
- this.headers.splice(0, 1);
+      let account = { text: "帳戶", value: "account_name", width: "60" };
+      let cate = { text: "分類", value: "cate_name", width: "60" };
+      // 加入欄位
+      if (!this.switchColsFlag) {
+        this.headers.splice(0, 0, cate);
+        this.headers.splice(0, 0, account);
+      }
+      // 移除欄位
+      else {
+        this.headers.splice(0, 1);
+        this.headers.splice(0, 1);
       }
 
-       this.switchColsFlag = !this.switchColsFlag
-     
-     
-      
+      this.switchColsFlag = !this.switchColsFlag;
 
       console.log("switch");
     },
@@ -240,7 +235,7 @@ export default {
       return total;
     },
     monthData() {
-      for (let i = 0; i <= 12; i++) {
+      for (let i = 1; i <= 12; i++) {
         if (i < 10) {
           i = "0" + i;
         }
@@ -250,6 +245,7 @@ export default {
       if (m < 10) {
         m = "0" + m;
       }
+      this.months.unshift("");
       this.search.m = m;
     },
     async save() {
@@ -375,10 +371,21 @@ export default {
         orderBy("spend_date", "desc"),
         where("spend_date", ">=", this.search.y + "-01-01"),
         where("spend_date", "<=", this.search.y + "-12-31"),
-        //  where("cate_name", "==", this.search.cate_name),
+        // where("cate_name", "==", this.search.cate_name),
         // where('expense','!=',false),
         limit(100)
       );
+
+      if (this.search.cate_name != "" && this.search.cate_name != undefined) {
+        q = query(
+          citiesCol,
+          orderBy("spend_date", "desc"),
+          where("spend_date", ">=", this.search.y + "-01-01"),
+          where("spend_date", "<=", this.search.y + "-12-31"),
+          where("cate_name", "==", this.search.cate_name),
+          limit(100)
+        );
+      }
       // 依年月查詢 (有選擇月)
       if (this.search.m != "00")
         q = query(
@@ -404,6 +411,56 @@ export default {
       });
       this.loading = false;
       // console.log(this.rows);
+    },
+
+    async getDataYM2() {
+      this.rows = [];
+      const queryConstraints = [];
+
+      // 判斷有無輸入類別帳戶,組合不同條件
+      let cate = this.search.cate_name;
+      let account = this.search.account_name;
+      let y = this.search.y;
+      let m = this.search.m;
+      // https://stackoverflow.com/questions/48036975/firestore-multiple-conditional-where-clauses
+      // if (group != null) queryConstraints.push(where("group", "==", group));
+      // if (pro != null) queryConstraints.push(where("pro", "==", pro));
+      // const q = query(collection(db, "videos"), ...queryConstraints);
+
+      const citiesRef = collection(db, collection_name);
+
+      if (y != null) {
+        queryConstraints.push(orderBy("spend_date", "desc"));
+        queryConstraints.push(where("spend_date", ">=", y + "-01-01"));
+        queryConstraints.push(where("spend_date", "<=", y + "-12-31"));
+      }
+
+      if (m != null && m != "") {
+        // queryConstraints.push( orderBy("spend_date", "desc"))
+        queryConstraints.push(
+          where("spend_date", ">=", this.search.y + "-" + m + "-01")
+        );
+
+        queryConstraints.push(
+          where("spend_date", "<=", this.search.y + "-" + m + "-31")
+        );
+      }
+
+      if (cate != null && cate != "")
+        queryConstraints.push(where("cate_name", "==", this.search.cate_name));
+
+      if (account != null && account != "")
+        queryConstraints.push(
+          where("account_name", "==", this.search.account_name)
+        );
+
+      const q = query(citiesRef, ...queryConstraints);
+     
+      // 資料
+      const docSnapBig = await getDocs(q);
+      docSnapBig.forEach(doc => {
+        this.rows.push({ ...doc.data(), id: doc.id });
+      });
     }
   }
 };
