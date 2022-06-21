@@ -63,11 +63,9 @@
         <!-- <v-text-field type="number" v-model="search.m" label="月"></v-text-field> -->
       </v-col>
       <v-col>
-        <v-btn @click="getDataYM">查詢</v-btn>
+       
       </v-col>
-      <v-col>
-        <v-btn @click="getDataYM2">查詢2</v-btn>
-      </v-col>
+     
     </v-row>
     <v-row>
       <v-col>
@@ -84,10 +82,12 @@
           v-model="search.cate_name"
         ></v-select>
       </v-col>
-
-      <v-col>
-        <v-btn @click="getDataByCate">分類查詢</v-btn>
+ <v-col>
+        <v-btn @click="getDataYM2">查詢</v-btn>
       </v-col>
+      <!-- <v-col>
+        <v-btn @click="getDataByCate">分類查詢</v-btn>
+      </v-col> -->
     </v-row>
     <v-row>
       <v-col cols="8">

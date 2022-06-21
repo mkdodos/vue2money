@@ -2,6 +2,7 @@ import VueRouter from 'vue-router'
 import Login from '../components/Login';
 import Stock from '../components/Stock';
 import Spend from '../components/Spend';
+import Cate from '../components/Cate';
 import Expense from '../components/Expense';
 import ExpenseDetail from '../components/ExpenseDetail';
 import ExpenseGas from '../components/ExpenseGas';
@@ -23,6 +24,7 @@ const router = new VueRouter({
         { name: 'Score', path: '/score', component: Score },
         { name: 'SpendCate', path: '/spend/cate', component: SpendCate },
         { name: 'Spend', path: '/spend', component: Spend },
+        { name: 'Cate', path: '/cate', component: Cate },
         { name: 'Expense', path: '/expense', component: Expense },
         { name: 'ExpenseDetail', path: '/expense/detail', component: ExpenseDetail },
         { name: 'ExpenseGas', path: '/expense/gas', component: ExpenseGas },
