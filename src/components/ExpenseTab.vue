@@ -63,7 +63,10 @@
         <!-- <v-text-field type="number" v-model="search.m" label="月"></v-text-field> -->
       </v-col>
       <v-col>
-       
+       <!-- <v-btn @click="openDialog" color="blue-grey" class="white--text">
+          新增          
+        </v-btn> -->
+
       </v-col>
      
     </v-row>
@@ -97,6 +100,9 @@
         <v-btn @click="switchCols">切換欄位</v-btn>
       </v-col>
     </v-row>
+
+<editDialog :rows="rows" />
+
     <!-- 表格 -->
     <v-row>
       <v-col cols="8"></v-col>
@@ -124,6 +130,7 @@
     </v-data-table>
     <!-- </v-col> -->
     <!-- </v-row> -->
+    
   </div>
 </template>
 
@@ -131,7 +138,7 @@
 // const collection_name = this.title;
 
 const collection_name = "expenses";
-
+import editDialog from '../components/expenseEditDialog.vue'
 import db from "../db.js";
 import {
   collection,
@@ -146,6 +153,8 @@ import {
   orderBy
 } from "firebase/firestore/lite";
 export default {
+  // 編輯表單設計一個獨立元件,可在多個頁面使用,易於維謢
+  components:{editDialog},
   // props: ["title", "text"],
   props: {
     title: {
@@ -154,7 +163,7 @@ export default {
     }
   },
   data() {
-    return {
+    return {   
       sortBy: "spend_date",
       sortDesc: true,
       editedIndex: -1,

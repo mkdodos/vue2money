@@ -77,8 +77,7 @@
         <!-- <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn> -->
         <!-- <v-btn @click="openDialog" color="blue-grey" class="ma-2 white--text"> -->
         <v-btn @click="openDialog" color="blue-grey" class="white--text">
-          新增
-          
+          新增          
         </v-btn>
       </v-col>
     </v-row>
