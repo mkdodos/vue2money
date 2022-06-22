@@ -177,7 +177,7 @@ export default {
       // 查詢預設當年月
       search: { y: new Date().getFullYear(), m: new Date().getMonth() + 1 },
       months: [],
-      accounts: ["", "現金", "信用卡"],
+      accounts: ["", "現金", "信用卡","土銀"],
       cates: ["餐費", "加油", "旅遊", "水電"],
       // 資料
       rows: [],
@@ -188,7 +188,7 @@ export default {
         // { text: "類別", value: "cate_name", width: "60" },
 
         { text: "項目", value: "note", width: "120" },
-        // { text: "收入", value: "income", width: "90" },
+        { text: "收入", value: "income", width: "90" },
         { text: "支出", value: "expense", width: "70" }
       ],
       loading: false,
@@ -423,6 +423,7 @@ export default {
     },
 
     async getDataYM2() {
+      this.loading = true;
       this.rows = [];
       const queryConstraints = [];
 
@@ -470,6 +471,7 @@ export default {
       docSnapBig.forEach(doc => {
         this.rows.push({ ...doc.data(), id: doc.id });
       });
+      this.loading = false;
     }
   }
 };

@@ -70,7 +70,7 @@ export default {
   props: { rows: Array },
   data() {
     return {
-      accounts: ["現金", "信用卡"],
+      accounts: ["現金", "信用卡","土銀"],
       cates: [],
       dialog: false,
       editedItem: {
@@ -95,6 +95,9 @@ export default {
   methods: {
     openDialog() {
       this.dialog = true;
+      
+      // this.editedItem.note = ''
+      // this.editedItem.expense = ''
       this.editedItem = Object.assign({}, this.defaultItem);
     },
     async getCates() {
@@ -131,7 +134,8 @@ export default {
           cate_name: this.editedItem.cate_name,
           account_name: this.editedItem.account_name,
           note: this.editedItem.note,
-          expense: this.editedItem.expense
+          income: this.editedItem.expense,
+          // expense: this.editedItem.expense
         });
 
         // 設定新增後取得的 id, 才可馬上做編輯
