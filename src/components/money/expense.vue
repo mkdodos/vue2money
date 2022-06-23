@@ -1,12 +1,17 @@
 <template>
   <div>
    
-    <v-data-table :loading="loading" mobile-breakpoint="300" :headers="headers" :items="rows"></v-data-table>
+   <expenseEditDialog :rows="rows"/>
+    <v-data-table 
+     :sort-by.sync="sortBy"
+    :sort-desc.sync="sortDesc"
+    :loading="loading" mobile-breakpoint="300" :headers="headers" :items="rows"></v-data-table>
   </div>
 </template>
 
 <script>
 import db from "../../db.js";
+import expenseEditDialog from "../../components/expenseEditDialog.vue"
 import {
   collection,
   // updateDoc,
@@ -17,11 +22,17 @@ import {
   getDocs,
   limit,
   where,
+  // orderBy,
   // orderBy
 } from "firebase/firestore/lite";
 export default {
+  components: {
+    expenseEditDialog
+  },
   data() {
     return {
+      sortBy: "spend_date",
+      sortDesc: true,
       // 資料
       rows: [],
       headers: [
@@ -41,6 +52,7 @@ export default {
       
       let q = query(
           ref,
+          // orderBy("spend_date","desc"),
           where("expense", "!=", ""),
           limit(100)
         );
