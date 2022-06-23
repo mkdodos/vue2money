@@ -45,9 +45,6 @@
             </v-col>
             <v-col class="text-right">
               <v-btn color="green" class="white--text" @click="save">儲存</v-btn>
-              <!-- <v-btn icon  @click="dialog = false">
-                <v-icon>mdi-close</v-icon>
-              </v-btn> -->
             </v-col>
           </v-row>
         </v-card-text>
@@ -70,49 +67,35 @@ import {
   orderBy
 } from "firebase/firestore/lite";
 export default {
-  props: {
-    rows: Array,
-    incomeOrExpense: String,
-    // dialog: { type: Boolean, defalut: false },
-    editedIndex: Number,
-    // editedItem: Object,
-    // defaultItem: Object
+  props: { rows: Array, incomeOrExpense: String, dialog: {type:Boolean, defalut:false},
+  editedIndex:Number,
+  editedItem:Object,
+  defaultItem:Object
+  
   },
   data() {
     return {
       accounts: ["現金", "信用卡", "土銀"],
       cates: [],
       // dialog: false,
-      editedItem: {
-        note: "",
-        expense: "",
-        // 2022-03-16 配合日期輸入框可用格式 yyyy-mm-dd
-        spend_date: new Date().toISOString().slice(0, 10)
-      },
-      defaultItem: {
-        note: "",
-        expense: "",
-        account_name: "現金",
-        cate_name: "餐費",
-        spend_date: new Date().toISOString().slice(0, 10)
-      },
-      // editedIndex: this.editedIndexFrom,
-      // dialog : this.dialogFrom
-      dialog: false
+      // editedItem: {
+      //   note: "",
+      //   expense: "",
+      //   // 2022-03-16 配合日期輸入框可用格式 yyyy-mm-dd
+      //   spend_date: new Date().toISOString().slice(0, 10)
+      // },
+      // defaultItem: {
+      //   note: "",
+      //   expense: "",
+      //   account_name: "現金",
+      //   cate_name: "餐費",
+      //   spend_date: new Date().toISOString().slice(0, 10)
+      // },
+      // editedIndex: -1
     };
   },
-  // watch:{
-  //   dialogFrom() {
-
-  //   }
-  // },
-  computed:{
-    // dialog(){
-    //   return this.dialogFrom
-    // }
-  },
   mounted() {
-    console.log(this.incomeOrExpense);
+    console.log(this.incomeOrExpense)
     this.getCates();
   },
   methods: {
@@ -157,21 +140,21 @@ export default {
           account_name: this.editedItem.account_name,
           note: this.editedItem.note
         };
-        if (this.incomeOrExpense == "expense")
-          row.expense = this.editedItem.expense;
-        else row.income = this.editedItem.expense;
+        if(this.incomeOrExpense=='expense')
+        row.expense = this.editedItem.expense
+        else
+        row.income = this.editedItem.expense
 
-        const docRef = await addDoc(
-          collection(db, collection_name),
-          row
-          // {
-          //   spend_date: this.editedItem.spend_date,
-          //   cate_name: this.editedItem.cate_name,
-          //   account_name: this.editedItem.account_name,
-          //   note: this.editedItem.note,
-          //   income: this.editedItem.expense
-          //   expense: this.editedItem.expense
-          // }
+        const docRef = await addDoc(collection(db, collection_name), 
+        row
+        // {
+        //   spend_date: this.editedItem.spend_date,
+        //   cate_name: this.editedItem.cate_name,
+        //   account_name: this.editedItem.account_name,
+        //   note: this.editedItem.note,
+        //   income: this.editedItem.expense
+        //   expense: this.editedItem.expense
+        // }
         );
 
         // 設定新增後取得的 id, 才可馬上做編輯

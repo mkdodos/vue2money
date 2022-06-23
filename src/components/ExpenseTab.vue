@@ -10,6 +10,12 @@
               <v-col cols="12" sm="6" md="6">
                 <v-text-field label="日期" v-model="editedItem.spend_date" type="date"></v-text-field>
               </v-col>
+              <v-col>
+                <v-radio-group row v-model="incomeOrExpense">
+                  <v-radio color="red" value="income" label="收入"></v-radio>
+                  <v-radio value="expense" label="支出"></v-radio>
+                </v-radio-group>
+              </v-col>
             </v-row>
             <v-row>
               <v-col>
@@ -26,11 +32,20 @@
                 <v-text-field label="項目" v-model="editedItem.note" hide-details="auto"></v-text-field>
               </v-col>
 
-              <v-col cols="12" sm="6" md="6">
+              <v-col v-if="incomeOrExpense=='expense'" cols="12" sm="6" md="6">
                 <v-text-field
-                  label="金額"
+                  label="支出金額"
                   append-icon="mdi-currency-usd"
                   v-model="editedItem.expense"
+                  type="number"
+                ></v-text-field>
+              </v-col>
+
+              <v-col v-if="incomeOrExpense=='income'" cols="12" sm="6" md="6">
+                <v-text-field
+                  label="收入金額"
+                  append-icon="mdi-currency-usd"
+                  v-model="editedItem.income"
                   type="number"
                 ></v-text-field>
               </v-col>
@@ -62,13 +77,7 @@
         <v-select :items="months" v-model="search.m"></v-select>
         <!-- <v-text-field type="number" v-model="search.m" label="月"></v-text-field> -->
       </v-col>
-      <v-col>
-       <!-- <v-btn @click="openDialog" color="blue-grey" class="white--text">
-          新增          
-        </v-btn> -->
-
-      </v-col>
-     
+      <v-col></v-col>
     </v-row>
     <v-row>
       <v-col>
@@ -85,12 +94,12 @@
           v-model="search.cate_name"
         ></v-select>
       </v-col>
- <v-col>
+      <v-col>
         <v-btn @click="getDataYM2">查詢</v-btn>
       </v-col>
       <!-- <v-col>
         <v-btn @click="getDataByCate">分類查詢</v-btn>
-      </v-col> -->
+      </v-col>-->
     </v-row>
     <v-row>
       <v-col cols="8">
@@ -101,8 +110,8 @@
       </v-col>
     </v-row>
 
-<editDialog :rows="rows" />
-
+    <!-- <editDialog :rows="rows" /> -->
+    <v-btn @click="openDialog" color="blue-grey" class="white--text">新增</v-btn>
     <!-- 表格 -->
     <v-row>
       <v-col cols="8"></v-col>
@@ -130,7 +139,6 @@
     </v-data-table>
     <!-- </v-col> -->
     <!-- </v-row> -->
-    
   </div>
 </template>
 
@@ -138,7 +146,7 @@
 // const collection_name = this.title;
 
 const collection_name = "expenses";
-import editDialog from '../components/expenseEditDialog.vue'
+// import editDialog from '../components/expenseEditDialog.vue'
 import db from "../db.js";
 import {
   collection,
@@ -154,7 +162,7 @@ import {
 } from "firebase/firestore/lite";
 export default {
   // 編輯表單設計一個獨立元件,可在多個頁面使用,易於維謢
-  components:{editDialog},
+  // components:{editDialog},
   // props: ["title", "text"],
   props: {
     title: {
@@ -163,12 +171,15 @@ export default {
     }
   },
   data() {
-    return {   
+    return {
+      incomeOrExpense: "expense",
       sortBy: "spend_date",
       sortDesc: true,
       editedIndex: -1,
       dialog: false,
       defaultItem: {
+        account_name: "現金",
+        cate_name: "餐費",
         note: "",
         expense: "",
         spend_date: new Date().toISOString().slice(0, 10)
@@ -177,7 +188,7 @@ export default {
       // 查詢預設當年月
       search: { y: new Date().getFullYear(), m: new Date().getMonth() + 1 },
       months: [],
-      accounts: ["", "現金", "信用卡","土銀"],
+      accounts: ["", "現金", "信用卡", "土銀"],
       cates: ["餐費", "加油", "旅遊", "水電"],
       // 資料
       rows: [],
@@ -224,13 +235,18 @@ export default {
     },
     editItem(item) {
       this.dialog = true;
+      if (item.income) this.incomeOrExpense = "income";
+      else this.incomeOrExpense = "expense";
+      // console.log(item.income)
       this.editedIndex = this.rows.indexOf(item);
       this.editedItem = Object.assign({}, item);
     },
     // 合計
     getTotal(arr) {
       let total = Object.keys(arr).reduce(function(previous, key) {
-        return previous + arr[key].expense * 1;
+        // expense 有可能為空
+        if (arr[key].expense) return previous + arr[key].expense * 1;
+        else return previous + 0;
       }, 0);
 
       // Create our number formatter.
@@ -256,6 +272,14 @@ export default {
       }
       this.months.unshift("");
       this.search.m = m;
+    },
+    openDialog() {
+      // 避免按下編輯鈕,沒有儲存,再按新增,欄位留下原本要編輯的值
+      // 所以在此將值設為預設值
+      this.editedItem = Object.assign({}, this.defaultItem);
+      this.editedIndex = -1;
+      this.incomeOrExpense = "expense";
+      this.dialog = true;
     },
     async save() {
       //更新
@@ -465,7 +489,7 @@ export default {
         );
 
       const q = query(citiesRef, ...queryConstraints);
-     
+
       // 資料
       const docSnapBig = await getDocs(q);
       docSnapBig.forEach(doc => {

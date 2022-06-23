@@ -1,9 +1,9 @@
 <template>
   <div>
-    收支
+    
     <v-row>
       <v-col><expense /></v-col>
-      <v-col> <income /></v-col>
+      <!-- <v-col> <income /></v-col> -->
     </v-row>
 
     
@@ -13,11 +13,11 @@
 
 <script>
 import expense from "../components/money/expense";
-import income from "../components/money/income";
+// import income from "../components/money/income";
 export default {
   components: {
     expense,
-    income
+    // income
   }
 };
 </script>
