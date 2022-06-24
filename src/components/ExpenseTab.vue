@@ -114,12 +114,21 @@
     <v-btn @click="openDialog" color="blue-grey" class="white--text">新增</v-btn>
     <!-- 表格 -->
     <v-row>
-      <v-col cols="8"></v-col>
+      <v-col cols="6"></v-col>
       <!-- 合計 -->
-      <v-col cols="4">
-        <v-btn outlined color="red" dark>{{ getTotal(rows) }}</v-btn>
-        <!-- <v-chip class="ma-2" color="green" outlined label>合計: {{ getTotal(rows) }}</v-chip> -->
+      <v-col cols="2">
+        <v-btn outlined color="red" dark>{{ getTotalIncome(rows) }}</v-btn>
       </v-col>
+      <v-col cols="2">
+        <v-btn outlined color="blue" dark>{{ getTotal(rows) }}</v-btn>
+      </v-col>
+
+       <v-col cols="2">        
+        <v-btn outlined color="green" dark>{{ getBalance(rows) }}</v-btn>
+        
+      </v-col>
+
+     
     </v-row>
     <!-- <v-row> -->
     <!-- <v-col cols="2"></v-col> -->
@@ -241,11 +250,58 @@ export default {
       this.editedIndex = this.rows.indexOf(item);
       this.editedItem = Object.assign({}, item);
     },
-    // 合計
+
+
+ // 結餘
+    getBalance(arr) {
+      let total = 0;
+      let totalIncome = Object.keys(arr).reduce(function(previous, key) {
+        // expense 有可能為空
+        if (arr[key].income) return previous + arr[key].income * 1;
+        else return previous + 0;
+      }, 0);
+      let totalExpense = Object.keys(arr).reduce(function(previous, key) {
+        // expense 有可能為空
+        if (arr[key].expense) return previous + arr[key].expense * 1;
+        else return previous + 0;
+      }, 0);
+
+      total = totalIncome - totalExpense
+
+      // Create our number formatter.
+      var formatter = new Intl.NumberFormat("en-US", {
+        // style: "currency",
+        currency: "USD"
+      });
+
+      total = formatter.format(total); /* $2,500.00 */
+
+      return total;
+    },
+
+    // 支出合計
     getTotal(arr) {
       let total = Object.keys(arr).reduce(function(previous, key) {
         // expense 有可能為空
         if (arr[key].expense) return previous + arr[key].expense * 1;
+        else return previous + 0;
+      }, 0);
+
+      // Create our number formatter.
+      var formatter = new Intl.NumberFormat("en-US", {
+        // style: "currency",
+        currency: "USD"
+      });
+
+      total = formatter.format(total); /* $2,500.00 */
+
+      return total;
+    },
+     // 收入合計
+    getTotalIncome(arr) {
+      let total = Object.keys(arr).reduce(function(previous, key) {
+        // income 有可能為空
+        if (arr[key].income) return previous + arr[key].income * 1;
         else return previous + 0;
       }, 0);
 
@@ -302,12 +358,14 @@ export default {
       } else {
         // 新增
 
-        const docRef = await addDoc(collection(db, collection_name), {
-          spend_date: this.editedItem.spend_date,
-          cate_name: this.editedItem.cate_name,
-          note: this.editedItem.note,
-          expense: this.editedItem.expense
-        });
+        const docRef = await addDoc(collection(db, collection_name),this.editedItem);
+
+        // const docRef = await addDoc(collection(db, collection_name), {
+        //   spend_date: this.editedItem.spend_date,
+        //   cate_name: this.editedItem.cate_name,
+        //   note: this.editedItem.note,
+        //   expense: this.editedItem.expense
+        // });
 
         // 設定新增後取得的 id, 才可馬上做編輯
         this.editedItem.id = docRef.id;

@@ -297,7 +297,8 @@ export default {
         citiesCol,
         // where 用 == 不能用 orderBy
         // orderBy("spend_date", "desc"),
-        where("spend_date", "==", this.theDate())
+        where("spend_date", "==", this.theDate()),
+        where("expense","!=","")
         // ,
         // where("spend_date", "<=", "2022-05-31")
       );
