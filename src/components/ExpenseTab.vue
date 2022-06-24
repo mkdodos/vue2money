@@ -32,6 +32,17 @@
                 <v-text-field label="項目" v-model="editedItem.note" hide-details="auto"></v-text-field>
               </v-col>
 
+              
+              <v-col v-if="incomeOrExpense=='income'" cols="12" sm="6" md="6">
+                <v-text-field
+                  label="收入金額"
+                  append-icon="mdi-currency-usd"
+                  v-model="editedItem.income"
+                  type="number"
+                ></v-text-field>
+              </v-col>
+              
+              
               <v-col v-if="incomeOrExpense=='expense'" cols="12" sm="6" md="6">
                 <v-text-field
                   label="支出金額"
@@ -41,14 +52,7 @@
                 ></v-text-field>
               </v-col>
 
-              <v-col v-if="incomeOrExpense=='income'" cols="12" sm="6" md="6">
-                <v-text-field
-                  label="收入金額"
-                  append-icon="mdi-currency-usd"
-                  v-model="editedItem.income"
-                  type="number"
-                ></v-text-field>
-              </v-col>
+              
             </v-row>
           </v-container>
           <v-row class="mb-6">
@@ -122,6 +126,8 @@
       <v-col cols="2">
         <v-btn outlined color="blue" dark>{{ getTotal(rows) }}</v-btn>
       </v-col>
+    
+     
 
        <v-col cols="2">        
         <v-btn outlined color="green" dark>{{ getBalance(rows) }}</v-btn>
@@ -197,7 +203,7 @@ export default {
       // 查詢預設當年月
       search: { y: new Date().getFullYear(), m: new Date().getMonth() + 1 },
       months: [],
-      accounts: ["", "現金", "信用卡", "土銀"],
+      accounts: ["", "現金", "信用卡","玉山", "土銀"],
       cates: ["餐費", "加油", "旅遊", "水電"],
       // 資料
       rows: [],
@@ -209,7 +215,9 @@ export default {
 
         { text: "項目", value: "note", width: "120" },
         { text: "收入", value: "income", width: "90" },
-        { text: "支出", value: "expense", width: "70" }
+        { text: "支出", value: "expense", width: "70" },
+        
+        
       ],
       loading: false,
       switchColsFlag: false
@@ -332,6 +340,7 @@ export default {
     openDialog() {
       // 避免按下編輯鈕,沒有儲存,再按新增,欄位留下原本要編輯的值
       // 所以在此將值設為預設值
+      this.defaultItem.account_name = this.search.account_name
       this.editedItem = Object.assign({}, this.defaultItem);
       this.editedIndex = -1;
       this.incomeOrExpense = "expense";
