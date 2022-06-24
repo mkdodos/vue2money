@@ -76,9 +76,7 @@
       <v-col cols="4">
         <!-- <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn> -->
         <!-- <v-btn @click="openDialog" color="blue-grey" class="ma-2 white--text"> -->
-        <v-btn @click="openDialog" color="blue-grey" class="white--text">
-          新增          
-        </v-btn>
+        <v-btn @click="openDialog" color="blue-grey" class="white--text">新增</v-btn>
       </v-col>
     </v-row>
 
@@ -87,7 +85,14 @@
         <v-row class="mb-1" cols="4" justify="space-between">
           <v-col @click="nextDay">{{ new Date(today).toISOString().slice(5, 10)}}</v-col>
           <!-- 合計 -->
-          <v-col cols="4">{{ getTotal(rows) }}</v-col>
+          <v-col cols="4">
+            <v-icon left>mdi-currency-usd</v-icon>
+            {{ getTotal(rows) }}</v-col>
+          <!-- 月合計 -->
+          <v-col cols="4">
+            <v-icon left>mdi-sigma</v-icon>
+            {{ getTotal(rowsMonth) }}
+          </v-col>
         </v-row>
       </v-card-title>
       <v-card-text>
@@ -131,6 +136,9 @@ const collection_name = "expenses";
 export default {
   data() {
     return {
+      // 月資料
+      rowsMonth: [],
+      // 單日資料
       rows: [],
       accounts: ["現金", "信用卡"],
       cates: ["餐費", "加油", "水電"],
@@ -156,8 +164,8 @@ export default {
       defaultItem: {
         note: "",
         expense: "",
-        account_name:"現金",
-        cate_name:"餐費",
+        account_name: "現金",
+        cate_name: "餐費",
         spend_date: new Date().toISOString().slice(0, 10)
       },
       editedIndex: -1,
@@ -168,9 +176,34 @@ export default {
   mounted() {
     this.getMoney();
     this.getCates();
+    this.getRowsMonth();
     // console.log(this.rows[0])
   },
   methods: {
+    // 月資料
+    async getRowsMonth() {
+      this.rowsMonth = [];
+
+      const citiesCol = collection(db, collection_name);
+      const q = query(
+        citiesCol,
+        orderBy("spend_date","desc"),        
+        where("spend_date", ">=", "2022-06-01"),
+        where("spend_date", "<=", "2022-06-30"),
+        where("trans_type","==","一般"),       
+      );
+
+      //  where("spend_date", ">=", y + "-" + m + "-01"),
+      //   where("spend_date", "<=", y + "-" + m + "-31"),
+      //   where("cate_name", "==", "加油"),
+      const citySnapshot = await getDocs(q);
+      citySnapshot.forEach(doc => {
+        let row = doc.data();
+        row.id = doc.id;
+        this.rowsMonth.push(row);
+      });
+    },
+    // 類別下拉資料來源
     async getCates() {
       this.cates = [];
       const cates = collection(db, "cates");
@@ -298,7 +331,7 @@ export default {
         // where 用 == 不能用 orderBy
         // orderBy("spend_date", "desc"),
         where("spend_date", "==", this.theDate()),
-        where("expense","!=","")
+        where("expense", "!=", "")
         // ,
         // where("spend_date", "<=", "2022-05-31")
       );
