@@ -139,6 +139,8 @@ export default {
     return {
       // 月資料
       rowsMonth: [],
+      // 月資料依類別
+      rowsMonthCates: [],
       // 單日資料
       rows: [],
       accounts: ["現金", "信用卡"],
@@ -204,13 +206,27 @@ export default {
         this.rowsMonth.push(row);
       });
 
-      // 統計月支出,把轉帳的資料排除
+      // 統計月支出,把轉帳和投資的資料排除
       // 使用 firestore 的 where 有一些限制, 沒法同時做二個欄位的 >= !=
-      // 改用 javascript 的 filter 
+      // 改用 javascript 的 filter
       this.rowsMonth = this.rowsMonth.filter(row => row.trans_type != "轉帳");
       this.rowsMonth = this.rowsMonth.filter(row => row.trans_type != "投資");
 
-      
+      // 統計該月每個分類金額
+      this.cates.forEach(cate => {
+        // 篩選資料
+        let temp = this.rowsMonth.filter(row => row.cate_name == cate);
+        let total = 0;
+        // 計算加總
+        temp.forEach(row => {
+          total += row.expense * 1;
+        });        
+        // this.rowsMonthCates.push({total:total,cate:cate});
+        // 加到陣列
+        this.rowsMonthCates.push({ total, cate });
+      });
+
+      console.log(this.rowsMonthCates);
     },
     // 類別下拉資料來源
     async getCates() {
@@ -351,7 +367,8 @@ export default {
       });
 
       // 排除轉帳和投資
-      this.rows = this.rows.filter(row=>row.trans_type!='轉帳')
+      this.rows = this.rows.filter(row => row.trans_type != "轉帳");
+      this.rows = this.rows.filter(row => row.trans_type != "投資");
 
       this.loading = false;
     }
