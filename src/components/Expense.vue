@@ -208,6 +208,7 @@ export default {
       // 使用 firestore 的 where 有一些限制, 沒法同時做二個欄位的 >= !=
       // 改用 javascript 的 filter 
       this.rowsMonth = this.rowsMonth.filter(row => row.trans_type != "轉帳");
+      this.rowsMonth = this.rowsMonth.filter(row => row.trans_type != "投資");
 
       
     },
@@ -348,6 +349,9 @@ export default {
         row.id = doc.id;
         this.rows.push(row);
       });
+
+      // 排除轉帳和投資
+      this.rows = this.rows.filter(row=>row.trans_type!='轉帳')
 
       this.loading = false;
     }

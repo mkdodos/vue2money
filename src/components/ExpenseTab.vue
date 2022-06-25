@@ -7,7 +7,7 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" sm="6" md="6">
+              <v-col cols="4" sm="4" md="4">
                 <v-text-field label="日期" v-model="editedItem.spend_date" type="date"></v-text-field>
               </v-col>
               <v-col>
@@ -15,6 +15,9 @@
                   <v-radio color="red" value="income" label="收入"></v-radio>
                   <v-radio value="expense" label="支出"></v-radio>
                 </v-radio-group>
+              </v-col>
+              <v-col cols="2" sm="2" md="3">
+                <v-select :items="types" v-model="editedItem.trans_type" label="type"></v-select>
               </v-col>
             </v-row>
             <v-row>
@@ -32,7 +35,6 @@
                 <v-text-field label="項目" v-model="editedItem.note" hide-details="auto"></v-text-field>
               </v-col>
 
-              
               <v-col v-if="incomeOrExpense=='income'" cols="12" sm="6" md="6">
                 <v-text-field
                   label="收入金額"
@@ -41,8 +43,7 @@
                   type="number"
                 ></v-text-field>
               </v-col>
-              
-              
+
               <v-col v-if="incomeOrExpense=='expense'" cols="12" sm="6" md="6">
                 <v-text-field
                   label="支出金額"
@@ -51,8 +52,6 @@
                   type="number"
                 ></v-text-field>
               </v-col>
-
-              
             </v-row>
           </v-container>
           <v-row class="mb-6">
@@ -126,15 +125,10 @@
       <v-col cols="2">
         <v-btn outlined color="blue" dark>{{ getTotal(rows) }}</v-btn>
       </v-col>
-    
-     
 
-       <v-col cols="2">        
+      <v-col cols="2">
         <v-btn outlined color="green" dark>{{ getBalance(rows) }}</v-btn>
-        
       </v-col>
-
-     
     </v-row>
     <!-- <v-row> -->
     <!-- <v-col cols="2"></v-col> -->
@@ -187,6 +181,7 @@ export default {
   },
   data() {
     return {
+      types: ['一般','轉帳','投資'],
       incomeOrExpense: "expense",
       sortBy: "spend_date",
       sortDesc: true,
@@ -203,7 +198,7 @@ export default {
       // 查詢預設當年月
       search: { y: new Date().getFullYear(), m: new Date().getMonth() + 1 },
       months: [],
-      accounts: ["", "現金", "信用卡","玉山", "土銀"],
+      accounts: ["", "現金", "信用卡", "玉山", "土銀"],
       cates: ["餐費", "加油", "旅遊", "水電"],
       // 資料
       rows: [],
@@ -211,13 +206,11 @@ export default {
         { text: "日期", value: "spend_date", width: "70" },
         // { text: "帳戶", value: "account_name", width: "100" },
 
-        // { text: "類別", value: "cate_name", width: "60" },
+        { text: "type", value: "trans_type", width: "60" },
 
         { text: "項目", value: "note", width: "120" },
         { text: "收入", value: "income", width: "90" },
-        { text: "支出", value: "expense", width: "70" },
-        
-        
+        { text: "支出", value: "expense", width: "70" }
       ],
       loading: false,
       switchColsFlag: false
@@ -259,8 +252,7 @@ export default {
       this.editedItem = Object.assign({}, item);
     },
 
-
- // 結餘
+    // 結餘
     getBalance(arr) {
       let total = 0;
       let totalIncome = Object.keys(arr).reduce(function(previous, key) {
@@ -274,7 +266,7 @@ export default {
         else return previous + 0;
       }, 0);
 
-      total = totalIncome - totalExpense
+      total = totalIncome - totalExpense;
 
       // Create our number formatter.
       var formatter = new Intl.NumberFormat("en-US", {
@@ -305,7 +297,7 @@ export default {
 
       return total;
     },
-     // 收入合計
+    // 收入合計
     getTotalIncome(arr) {
       let total = Object.keys(arr).reduce(function(previous, key) {
         // income 有可能為空
@@ -340,7 +332,7 @@ export default {
     openDialog() {
       // 避免按下編輯鈕,沒有儲存,再按新增,欄位留下原本要編輯的值
       // 所以在此將值設為預設值
-      this.defaultItem.account_name = this.search.account_name
+      this.defaultItem.account_name = this.search.account_name;
       this.editedItem = Object.assign({}, this.defaultItem);
       this.editedIndex = -1;
       this.incomeOrExpense = "expense";
@@ -367,7 +359,10 @@ export default {
       } else {
         // 新增
 
-        const docRef = await addDoc(collection(db, collection_name),this.editedItem);
+        const docRef = await addDoc(
+          collection(db, collection_name),
+          this.editedItem
+        );
 
         // const docRef = await addDoc(collection(db, collection_name), {
         //   spend_date: this.editedItem.spend_date,
