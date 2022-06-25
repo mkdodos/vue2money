@@ -90,7 +90,7 @@
             {{ getTotal(rows) }}
           </v-col>
           <!-- 月合計 -->
-          <v-col cols="4">
+          <v-col @click="dialogType=true" cols="4">
             <v-icon left>mdi-sigma</v-icon>
             {{ getTotal(rowsMonth) }}
           </v-col>
@@ -115,6 +115,23 @@
         </v-data-table>
       </v-card-text>
     </v-card>
+    <!-- 類別明細 -->
+     <v-dialog v-model="dialogType" width="500">
+     <v-data-table
+     sort-by="total"
+     :sort-desc="true"
+          :items-per-page="100"
+          :hide-default-footer="true"
+          mobile-breakpoint="360"
+          :loading="loading"
+          :headers="headersType"
+          :items="rowsMonthCates"        
+         
+        >
+         
+        </v-data-table>
+     </v-dialog>
+
   </div>
 </template>
 
@@ -155,7 +172,16 @@ export default {
         { text: "type", value: "trans_type" }
         // { text: "", value: "actions" }
       ],
+
+       headersType: [
+      
+        { text: "項目", value: "cate", width: "180" },       
+        { text: "金額", value: "total", width: "60" },
+      
+       
+      ],
       dialog: false,
+      dialogType: false,
       loading: true,
       search: "",
       editedItem: {
@@ -220,9 +246,10 @@ export default {
         // 計算加總
         temp.forEach(row => {
           total += row.expense * 1;
-        });        
+        });
         // this.rowsMonthCates.push({total:total,cate:cate});
         // 加到陣列
+        if(total>0)
         this.rowsMonthCates.push({ total, cate });
       });
 
