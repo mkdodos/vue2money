@@ -87,7 +87,8 @@
           <!-- 合計 -->
           <v-col cols="4">
             <v-icon left>mdi-currency-usd</v-icon>
-            {{ getTotal(rows) }}</v-col>
+            {{ getTotal(rows) }}
+          </v-col>
           <!-- 月合計 -->
           <v-col cols="4">
             <v-icon left>mdi-sigma</v-icon>
@@ -148,8 +149,8 @@ export default {
         // { text: "類別", value: "cate_name", width: "100" },
         { text: "項目", value: "note", width: "180" },
         // { text: "收入", value: "income" },
-        { text: "金額", value: "expense", width: "60" }
-        // { text: "備註", value: "note_html" },
+        { text: "金額", value: "expense", width: "60" },
+        { text: "type", value: "trans_type" }
         // { text: "", value: "actions" }
       ],
       dialog: false,
@@ -187,10 +188,10 @@ export default {
       const citiesCol = collection(db, collection_name);
       const q = query(
         citiesCol,
-        orderBy("spend_date","desc"),        
+        orderBy("spend_date", "desc"),
         where("spend_date", ">=", "2022-06-01"),
-        where("spend_date", "<=", "2022-06-30"),
-        where("trans_type","==","一般"),       
+        where("spend_date", "<=", "2022-06-30")
+        // where("trans_type","==","一般"),
       );
 
       //  where("spend_date", ">=", y + "-" + m + "-01"),
@@ -202,6 +203,13 @@ export default {
         row.id = doc.id;
         this.rowsMonth.push(row);
       });
+
+      // 統計月支出,把轉帳的資料排除
+      // 使用 firestore 的 where 有一些限制, 沒法同時做二個欄位的 >= !=
+      // 改用 javascript 的 filter 
+      this.rowsMonth = this.rowsMonth.filter(row => row.trans_type != "轉帳");
+
+      
     },
     // 類別下拉資料來源
     async getCates() {
@@ -213,7 +221,7 @@ export default {
         // this.cates.push({ ...doc.data(), id: doc.id });
         this.cates.push(doc.data().name);
       });
-      console.log(this.cates);
+      // console.log(this.cates);
     },
 
     // 合計
@@ -244,7 +252,6 @@ export default {
       });
 
       this.loading = false;
-      console.log("query");
     },
     // 做為查詢的日期 2022-05-24
     theDate() {
