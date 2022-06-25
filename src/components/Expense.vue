@@ -82,7 +82,7 @@
 
     <v-card>
       <v-card-title>
-        <v-row class="mb-1" cols="4" justify="space-between">
+        <v-row class="mb-1" cols="3" justify="space-between">
           <v-col @click="nextDay">{{ new Date(today).toISOString().slice(5, 10)}}</v-col>
           <!-- 合計 -->
           <v-col cols="4">
@@ -90,7 +90,7 @@
             {{ getTotal(rows) }}
           </v-col>
           <!-- 月合計 -->
-          <v-col @click="dialogType=true" cols="4">
+          <v-col @click="dialogType=true" cols="5">
             <v-icon left>mdi-sigma</v-icon>
             {{ getTotal(rowsMonth) }}
           </v-col>
@@ -237,7 +237,7 @@ export default {
       // 改用 javascript 的 filter
       this.rowsMonth = this.rowsMonth.filter(row => row.trans_type != "轉帳");
       this.rowsMonth = this.rowsMonth.filter(row => row.trans_type != "投資");
-
+console.log(this.rowsMonth)
       // 統計該月每個分類金額
       this.cates.forEach(cate => {
         // 篩選資料
