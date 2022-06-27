@@ -98,7 +98,7 @@
         ></v-select>
       </v-col>
       <v-col>
-        <v-btn @click="getDataYM2">查詢</v-btn>
+        <v-btn @click="getDataYM">查詢</v-btn>
       </v-col>
       <!-- <v-col>
         <v-btn @click="getDataByCate">分類查詢</v-btn>
@@ -119,7 +119,7 @@
     <v-row>
       <v-col cols="6"></v-col>
       <!-- 合計 -->
-      <v-col cols="2">
+      <v-col cols="2" sm="2">
         <v-btn outlined color="red" dark>{{ getTotalIncome(rows) }}</v-btn>
       </v-col>
       <v-col cols="2">
@@ -181,7 +181,7 @@ export default {
   },
   data() {
     return {
-      types: ['一般','轉帳','投資'],
+      types: ["一般", "轉帳", "投資"],
       incomeOrExpense: "expense",
       sortBy: "spend_date",
       sortDesc: true,
@@ -206,7 +206,7 @@ export default {
         { text: "日期", value: "spend_date", width: "70" },
         // { text: "帳戶", value: "account_name", width: "100" },
 
-        { text: "type", value: "trans_type", width: "60" },
+        
 
         { text: "項目", value: "note", width: "120" },
         { text: "收入", value: "income", width: "90" },
@@ -228,13 +228,17 @@ export default {
     switchCols() {
       let account = { text: "帳戶", value: "account_name", width: "60" };
       let cate = { text: "分類", value: "cate_name", width: "60" };
+      let type = { text: "type", value: "trans_type", width: "60" }
       // 加入欄位
       if (!this.switchColsFlag) {
+        this.headers.splice(0, 0, type);
         this.headers.splice(0, 0, cate);
         this.headers.splice(0, 0, account);
+        
       }
       // 移除欄位
       else {
+        this.headers.splice(0, 1);
         this.headers.splice(0, 1);
         this.headers.splice(0, 1);
       }
@@ -455,60 +459,6 @@ export default {
     },
 
     async getDataYM() {
-      this.rows = [];
-      this.loading = true;
-      // const citiesCol = collection(db, collection_name);
-      const citiesCol = collection(db, this.title);
-      // 依年查詢
-      let q = query(
-        citiesCol,
-        // orderBy("expense", "desc"),
-        orderBy("spend_date", "desc"),
-        where("spend_date", ">=", this.search.y + "-01-01"),
-        where("spend_date", "<=", this.search.y + "-12-31"),
-        // where("cate_name", "==", this.search.cate_name),
-        // where('expense','!=',false),
-        limit(100)
-      );
-
-      if (this.search.cate_name != "" && this.search.cate_name != undefined) {
-        q = query(
-          citiesCol,
-          orderBy("spend_date", "desc"),
-          where("spend_date", ">=", this.search.y + "-01-01"),
-          where("spend_date", "<=", this.search.y + "-12-31"),
-          where("cate_name", "==", this.search.cate_name),
-          limit(100)
-        );
-      }
-      // 依年月查詢 (有選擇月)
-      if (this.search.m != "00")
-        q = query(
-          citiesCol,
-          orderBy("spend_date", "desc"),
-          where(
-            "spend_date",
-            ">=",
-            this.search.y + "-" + this.search.m + "-01"
-          ),
-          where(
-            "spend_date",
-            "<=",
-            this.search.y + "-" + this.search.m + "-31"
-          ),
-          //  orderBy("expense", "desc"),
-          // where('expense','!=',false),
-          limit(100)
-        );
-      const docSnapBig = await getDocs(q);
-      docSnapBig.forEach(doc => {
-        this.rows.push({ ...doc.data(), id: doc.id });
-      });
-      this.loading = false;
-      // console.log(this.rows);
-    },
-
-    async getDataYM2() {
       this.loading = true;
       this.rows = [];
       const queryConstraints = [];
@@ -525,8 +475,8 @@ export default {
 
       const citiesRef = collection(db, collection_name);
 
-      if (y != null) {
-        queryConstraints.push(orderBy("spend_date", "desc"));
+      queryConstraints.push(orderBy("spend_date", "desc"));
+      if (y != null && y != "") {
         queryConstraints.push(where("spend_date", ">=", y + "-01-01"));
         queryConstraints.push(where("spend_date", "<=", y + "-12-31"));
       }
@@ -534,11 +484,11 @@ export default {
       if (m != null && m != "") {
         // queryConstraints.push( orderBy("spend_date", "desc"))
         queryConstraints.push(
-          where("spend_date", ">=", this.search.y + "-" + m + "-01")
+          where("spend_date", ">=", y + "-" + m + "-01")
         );
 
         queryConstraints.push(
-          where("spend_date", "<=", this.search.y + "-" + m + "-31")
+          where("spend_date", "<=", y + "-" + m + "-31")
         );
       }
 

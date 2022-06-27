@@ -2,6 +2,7 @@ import VueRouter from 'vue-router'
 import Login from '../components/Login';
 import Stock from '../components/Stock';
 import Spend from '../components/Spend';
+import Account from '../components/Account';
 import Cate from '../components/Cate';
 import Balance from '../views/Balance';
 import Expense from '../components/Expense';
@@ -25,6 +26,7 @@ const router = new VueRouter({
         { name: 'Score', path: '/score', component: Score },
         { name: 'SpendCate', path: '/spend/cate', component: SpendCate },
         { name: 'Spend', path: '/spend', component: Spend },
+        { name: 'Account', path: '/account', component: Account },
         { name: 'Cate', path: '/cate', component: Cate },
         { name: 'Balance', path: '/views/balance', component: Balance },
         { name: 'Expense', path: '/expense', component: Expense },

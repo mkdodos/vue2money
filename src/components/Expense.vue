@@ -116,22 +116,18 @@
       </v-card-text>
     </v-card>
     <!-- 類別明細 -->
-     <v-dialog v-model="dialogType" width="500">
-     <v-data-table
-     sort-by="total"
-     :sort-desc="true"
-          :items-per-page="100"
-          :hide-default-footer="true"
-          mobile-breakpoint="360"
-          :loading="loading"
-          :headers="headersType"
-          :items="rowsMonthCates"        
-         
-        >
-         
-        </v-data-table>
-     </v-dialog>
-
+    <v-dialog v-model="dialogType" width="500">
+      <v-data-table
+        sort-by="total"
+        :sort-desc="true"
+        :items-per-page="100"
+        :hide-default-footer="true"
+        mobile-breakpoint="360"
+        :loading="loading"
+        :headers="headersType"
+        :items="rowsMonthCates"
+      ></v-data-table>
+    </v-dialog>
   </div>
 </template>
 
@@ -152,6 +148,9 @@ import {
 
 const collection_name = "expenses";
 export default {
+  // watch:{rowsMonth:{
+  //   handler:getTotal()
+  // }},
   data() {
     return {
       // 月資料
@@ -169,16 +168,13 @@ export default {
         { text: "項目", value: "note", width: "180" },
         // { text: "收入", value: "income" },
         { text: "金額", value: "expense", width: "60" },
-        { text: "type", value: "trans_type" }
+        // { text: "type", value: "trans_type" }
         // { text: "", value: "actions" }
       ],
 
-       headersType: [
-      
-        { text: "項目", value: "cate", width: "180" },       
-        { text: "金額", value: "total", width: "60" },
-      
-       
+      headersType: [
+        { text: "項目", value: "cate", width: "180" },
+        { text: "金額", value: "total", width: "60" }
       ],
       dialog: false,
       dialogType: false,
@@ -237,7 +233,7 @@ export default {
       // 改用 javascript 的 filter
       this.rowsMonth = this.rowsMonth.filter(row => row.trans_type != "轉帳");
       this.rowsMonth = this.rowsMonth.filter(row => row.trans_type != "投資");
-console.log(this.rowsMonth)
+      console.log(this.rowsMonth);
       // 統計該月每個分類金額
       this.cates.forEach(cate => {
         // 篩選資料
@@ -249,11 +245,10 @@ console.log(this.rowsMonth)
         });
         // this.rowsMonthCates.push({total:total,cate:cate});
         // 加到陣列
-        if(total>0)
-        this.rowsMonthCates.push({ total, cate });
+        if (total > 0) this.rowsMonthCates.push({ total, cate });
       });
 
-      console.log(this.rowsMonthCates);
+      // console.log(this.rowsMonthCates);
     },
     // 類別下拉資料來源
     async getCates() {
@@ -325,6 +320,7 @@ console.log(this.rowsMonth)
       if (!confirm("確定刪除")) return;
       await deleteDoc(doc(db, collection_name, id));
       this.rows.splice(index, 1);
+      this.rowsMonth.splice(index, 1);
       this.editedItem = Object.assign({}, this.defaultItem);
       this.editedIndex = -1;
       this.dialog = false;
@@ -345,6 +341,8 @@ console.log(this.rowsMonth)
         // Object.assign(target, ...sources)
         // 將表單的值傳回表格中
         Object.assign(this.rows[this.editedIndex], this.editedItem);
+
+        Object.assign(this.rowsMonth[this.editedIndex], this.editedItem);
 
         this.$nextTick(() => {
           // 將表單的值設成預設值
@@ -367,7 +365,8 @@ console.log(this.rowsMonth)
         this.editedItem.id = docRef.id;
         // 將項目加入到資料列
         this.rows.unshift(this.editedItem);
-        // console.log(this.rows);
+        this.rowsMonth.unshift(this.editedItem);
+        console.log(this.rowsMonth);
       }
 
       this.dialog = false;
