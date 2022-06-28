@@ -15,14 +15,20 @@ import SpendTab from '../components/SpendTab';
 import CashIn from '../components/CashIn';
 import Score from '../components/Score';
 import StockTransaction from '../components/StockTransaction';
+import Home from '../components/Home.vue';
+
 
 import '../firebase/init';
 
-import { getAuth } from "firebase/auth";
+// import { getAuth } from "firebase/auth";
 
 const router = new VueRouter({
     mode: 'history',
     routes: [
+        {
+            path: '/',
+            component: Home
+          },
         { name: 'Score', path: '/score', component: Score },
         { name: 'SpendCate', path: '/spend/cate', component: SpendCate },
         { name: 'Spend', path: '/spend', component: Spend },
@@ -49,16 +55,25 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
+    const isLogin = localStorage.getItem('token') == 'ImLogin' ;
+    if( isLogin ){
+        next();
+      } else {
+        if( to.path !== '/login')
+          next('/login');
+        else
+          next();
+      }
     // 路由中有包含此值,就導向登入頁
-    const auth = getAuth();
-    const user = auth.currentUser;
-    const requiresAuth = to.matched.some(record => record.meta.requiresAuth)    
-    if (requiresAuth && !user)
-        next('/login')
-    else if (requiresAuth && user)
-        next()
-    else
-        next()
+    // const auth = getAuth();
+    // const user = auth.currentUser;
+    // const requiresAuth = to.matched.some(record => record.meta.requiresAuth)    
+    // if (requiresAuth && !user)
+    //     next('/login')
+    // else if (requiresAuth && user)
+    //     next()
+    // else
+    //     next()
 })
 
 export default router;

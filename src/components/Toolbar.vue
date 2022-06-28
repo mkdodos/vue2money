@@ -49,7 +49,7 @@
        <!-- <v-btn to="/cash-in" text>Cash In</v-btn> -->
        <v-btn to="/spend" text>Spend</v-btn>
       <v-btn to="/spend-tab" text>SpendTab</v-btn>
-     
+       <a href="" @click.prevent="logout">Logout</a>
     </v-toolbar>
   </div>
 </template>
@@ -76,6 +76,7 @@ export default {
     logout() {
       console.log("log");
       signOut(auth).then(() => {
+         localStorage.removeItem('token');
         // 轉址
         this.$router.replace("/login");
       });
