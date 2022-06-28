@@ -44,9 +44,12 @@ export default {
           // this.$router.push('/');
           // if(userCredential){
 
-             localStorage.setItem('token', 'ImLogin')
+            
           const user = userCredential.user;
-          console.log(user.email);
+          
+          // 記錄使用者 ID
+          // localStorage.setItem('token', user.uid)
+          console.log(user.uid);
           this.$router.push("stock-transaction");
           //  }
 

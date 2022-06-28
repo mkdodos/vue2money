@@ -47,8 +47,8 @@
        <v-btn to="/views/balance" text>收支</v-btn>
      
        <!-- <v-btn to="/cash-in" text>Cash In</v-btn> -->
-       <v-btn to="/spend" text>Spend</v-btn>
-      <v-btn to="/spend-tab" text>SpendTab</v-btn>
+       <!-- <v-btn to="/spend" text>Spend</v-btn>
+      <v-btn to="/spend-tab" text>SpendTab</v-btn> -->
        <a href="" @click.prevent="logout">Logout</a>
     </v-toolbar>
   </div>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-btn @click="openDialog" color="blue-grey" class="white--text">新增</v-btn>
-    <!-- 輸入表單 -->
+    <!-- 編輯表單 -->
     <v-dialog v-model="dialog" width="500">
       <v-card>
         <v-card-title class="text-h5 lighten-2">編輯</v-card-title>
@@ -16,6 +16,9 @@
             <v-row>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field label="順序" v-model="editedItem.prior" hide-details="auto"></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-text-field label="user id" v-model="editedItem.user_id"></v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -38,7 +41,6 @@
 
     <v-data-table :items="rows" @click:row="editItem" mobile-breakpoint="360" :headers="headers"></v-data-table>
     <v-data-table :items="rowsBalance" mobile-breakpoint="360" :headers="headersBalance"></v-data-table>
-
   </div>
 </template>
 
@@ -53,9 +55,11 @@ import {
   query,
   getDocs,
   // limit,
-  // where,
-  orderBy
+  where
+  // orderBy
 } from "firebase/firestore/lite";
+
+import { getAuth } from "firebase/auth";
 
 const collection_name = "accounts";
 export default {
@@ -73,6 +77,10 @@ export default {
         {
           text: "順序",
           value: "prior"
+        },
+        {
+          text: "User",
+          value: "user_id"
         }
       ],
       headersBalance: [
@@ -123,7 +131,9 @@ export default {
       if (this.editedIndex > -1) {
         console.log(this.editedItem.id);
         const ref = doc(db, collection_name, this.editedItem.id);
-
+        const auth = getAuth();
+        const user = auth.currentUser;
+        this.editedItem.user_id = user.uid;
         await updateDoc(ref, this.editedItem);
 
         // Object.assign(target, ...sources)
@@ -156,7 +166,11 @@ export default {
     async getData() {
       this.rows = [];
       const cates = collection(db, collection_name);
-      let q = query(cates, orderBy("prior"));
+      
+      // let q = query(cates, where('user_id','==','2'));
+      const auth = getAuth();
+      const user = auth.currentUser;
+      let q = query(cates, where("user_id", "==", user.uid));
       const docSnapBig = await getDocs(q);
       docSnapBig.forEach(doc => {
         this.rows.push({ ...doc.data(), id: doc.id });
@@ -193,31 +207,33 @@ export default {
         accountData.push({ ...doc.data() });
       });
       console.log(accountData);
-      this.rows.forEach(acc => {        
+      this.rows.forEach(acc => {
         let u3 = accountData.filter(row => row.account_name == acc.name);
         // 收入
-        let arrIncome = u3.filter(row=>row.income!='' && row.income!=null)
-        let arrExpense = u3.filter(row=>row.expense!='' && row.expense!=null)
+        let arrIncome = u3.filter(
+          row => row.income != "" && row.income != null
+        );
+        let arrExpense = u3.filter(
+          row => row.expense != "" && row.expense != null
+        );
         // let arrExpense = u3.filter(row=>row.expense!=null)
-        let totalIncome = 0
-        let totalExpense = 0
-        arrIncome.forEach(row=>{
-          totalIncome+=row.income*1
-        })
+        let totalIncome = 0;
+        let totalExpense = 0;
+        arrIncome.forEach(row => {
+          totalIncome += row.income * 1;
+        });
 
-        arrExpense.forEach(row=>{
-          totalExpense+=row.expense*1
-        })
+        arrExpense.forEach(row => {
+          totalExpense += row.expense * 1;
+        });
 
         // console.log(totalIncome);
-         this.rowsBalance.push({
-        name: acc.name,
-        total: totalIncome - totalExpense 
-      });
+        this.rowsBalance.push({
+          name: acc.name,
+          total: totalIncome - totalExpense
+        });
         // console.log(expense);
       });
-
-     
 
       // });
       // this.rows.forEach(row => {
