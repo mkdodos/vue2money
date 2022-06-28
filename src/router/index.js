@@ -65,12 +65,38 @@ router.beforeEach( (to, from, next) => {
     //     next()
     // }
     // const isLogin = localStorage.getItem('token') == user.uid ;
-    if( user ){
-        next();
-      } else if( to.path !== '/login')
-          next('/login');
-        else
-          next();
+//    if(user){
+//     next();
+//    }else if(to.path !== '/login'){
+//     next('/login');
+//    }else{
+//     next();
+//    }
+
+   if(user){
+    next();
+   }else{
+    if(to.path !== '/login'){
+            next('/login');
+           }else{
+            next();
+           }
+   }
+
+    
+    // if( user ){
+    //     next();
+    //   } else
+    //   {
+    //     if( !user && to.path !== '/login'){
+    //         next('/login');
+    //     }       
+    //   else{
+    //     next();
+    //   }
+        
+    //   }
+     
       
     // 路由中有包含此值,就導向登入頁
     // const auth = getAuth();

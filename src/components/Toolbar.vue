@@ -40,6 +40,7 @@
           </v-list-item>
         </v-list>
       </v-menu>
+       <v-btn to="/" text>H</v-btn>
        <v-btn to="/account" text>帳戶</v-btn>
        <v-btn to="/expense" text>支出</v-btn>
        <v-btn to="/expense-tab" text>支出明細</v-btn>
