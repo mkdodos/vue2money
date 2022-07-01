@@ -31,14 +31,14 @@ const auth = getAuth();
 export default {
   data() {
     return {
-      email: "mk123@gmail.com",
+      email: "mkdodos@gmail.com",
       password: "123456"
     };
   },
   methods: {
-    login() {
+     login() {
       // firebase 登入
-      signInWithEmailAndPassword(auth, this.email, this.password)
+       signInWithEmailAndPassword(auth, this.email, this.password)
         .then(userCredential => {
           // 轉址
           // this.$router.push('/');
@@ -48,9 +48,12 @@ export default {
           const user = userCredential.user;
           
           // 記錄使用者 ID
-          // localStorage.setItem('token', user.uid)
+          localStorage.setItem('token', user.uid)
+          localStorage.setItem('email', user.email)
+          // this.$store.dispatch('user','123')
           console.log(user.uid);
-          this.$router.push("stock-transaction");
+          // this.$router.push("stock-transaction");
+          this.$router.replace("/");
           //  }
 
           // else

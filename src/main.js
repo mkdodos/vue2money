@@ -8,6 +8,8 @@ import router from './router/index';
 // import { routes } from './routes' //路由規則
 
 
+import store from './vuex';
+
 Vue.config.productionTip = false
 Vue.use(VueRouter)
 
@@ -22,6 +24,7 @@ new Vue({
   // Chart,
   vuetify,
   router,
+  store,
   // routerGuard,
   // routerGuard,
   render: h => h(App)

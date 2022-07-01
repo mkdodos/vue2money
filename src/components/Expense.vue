@@ -91,7 +91,7 @@
           </v-col>
           <!-- 月合計 -->
           <v-col @click="dialogType=true" cols="5">
-            <v-icon left>mdi-sigma</v-icon>
+            <v-icon left>mdi-calendar</v-icon>
             {{ getTotal(rowsMonth) }}
           </v-col>
         </v-row>
@@ -205,16 +205,21 @@ export default {
     // console.log(this.rows[0])
   },
   methods: {
-    // 月資料
+    // 本月資料
     async getRowsMonth() {
       this.rowsMonth = [];
-
+      // let m = new Date().getMonth()+1;
+      let m = 6;
+      if(m<10){
+        m='0'+m;
+      }
+      console.log(m)
       const citiesCol = collection(db, collection_name);
       const q = query(
         citiesCol,
         orderBy("spend_date", "desc"),
-        where("spend_date", ">=", "2022-06-01"),
-        where("spend_date", "<=", "2022-06-30")
+        where("spend_date", ">=", "2022-"+m+"-01"),
+        where("spend_date", "<=", "2022-"+m+"-31")
         // where("trans_type","==","一般"),
       );
 

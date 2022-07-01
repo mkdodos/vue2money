@@ -45,12 +45,16 @@
        <v-btn to="/expense" text>支出</v-btn>
        <v-btn to="/expense-tab" text>支出明細</v-btn>
        <v-btn to="/expense/gas" text>加油</v-btn>
-       <v-btn to="/views/balance" text>收支</v-btn>
+       <v-btn v-if="email" to="/views/balance" text>收支</v-btn>
      
+ <v-btn  @click="logout" text >登出</v-btn>
+
        <!-- <v-btn to="/cash-in" text>Cash In</v-btn> -->
        <!-- <v-btn to="/spend" text>Spend</v-btn>
       <v-btn to="/spend-tab" text>SpendTab</v-btn> -->
-       <a href="" @click.prevent="logout">Logout</a>
+       <!-- <a href="" @click.prevent="logout">Logout</a> -->
+       {{user}}
+       <!-- {{ localStorage.getItem('email') }} -->
     </v-toolbar>
   </div>
 </template>
@@ -69,15 +73,44 @@ const firebaseConfig = {
 
 initializeApp(firebaseConfig);
 import { getAuth, signOut } from "firebase/auth";
-
+import {mapGetters} from 'vuex'
 const auth = getAuth();
+
 export default {
+  data() {
+    return {
+      email: '',
+      isLogin: localStorage.getItem('email')
+    }
+  },
+  watch:{
+    isLogin(){
+      console.log('ddd')
+    }
+  },
+  created() {
+    
+    // let token = localStorage.getItem('token')
+    this.email = localStorage.getItem('email')
+    // if(localStorage.getItem('email')){
+    //   this.isLogin = true
+    // }
+    // console.log(email)
+    // const auth = getAuth();
+    // console.log(auth.currentUser.uid)
+  },
+  computed: {
+    ...mapGetters(['user'])
+  },
   methods: {
     // 登出
-    logout() {
+  async logout() {
       console.log("log");
-      signOut(auth).then(() => {
+      await signOut(auth).then(() => {
          localStorage.removeItem('token');
+         localStorage.removeItem('email');
+        //  this.$store.dispatch('user',null)
+         this.isLogin = false
         // 轉址
         this.$router.replace("/login");
       });

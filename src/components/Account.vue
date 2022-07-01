@@ -9,7 +9,7 @@
           <v-container>
             <v-row>
               <v-col>
-                <v-text-field label="分類" v-model="editedItem.name"></v-text-field>
+                <v-text-field label="帳戶名稱" v-model="editedItem.name"></v-text-field>
               </v-col>
             </v-row>
 
@@ -149,6 +149,13 @@ export default {
       } else {
         // 新增
 
+
+ 
+        const auth = getAuth();
+        const user = auth.currentUser;
+        this.editedItem.user_id = user.uid;
+
+
         const docRef = await addDoc(
           collection(db, collection_name),
           this.editedItem
@@ -167,10 +174,11 @@ export default {
       this.rows = [];
       const cates = collection(db, collection_name);
       
-      // let q = query(cates, where('user_id','==','2'));
+      let q = query(cates);
       const auth = getAuth();
       const user = auth.currentUser;
-      let q = query(cates, where("user_id", "==", user.uid));
+      if(user.email!='mkdodos@gmail.com')
+      q = query(cates, where("user_id", "==", user.uid));
       const docSnapBig = await getDocs(q);
       docSnapBig.forEach(doc => {
         this.rows.push({ ...doc.data(), id: doc.id });

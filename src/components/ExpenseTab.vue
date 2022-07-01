@@ -198,7 +198,8 @@ export default {
       // 查詢預設當年月
       search: { y: new Date().getFullYear(), m: new Date().getMonth() + 1 },
       months: [],
-      accounts: ["", "現金", "信用卡", "玉山", "土銀"],
+      // accounts: ["", "現金", "信用卡", "玉山", "土銀"],
+      accounts: [],
       cates: ["餐費", "加油", "旅遊", "水電"],
       // 資料
       rows: [],
@@ -221,6 +222,7 @@ export default {
     // console.log(this.title);
     this.monthData();
     this.getDataYM();
+    this.getAccounts();
     this.getCates();
   },
   methods: {
@@ -392,6 +394,20 @@ export default {
       this.editedIndex = -1;
       this.dialog = false;
     },
+
+
+async getAccounts() {
+      this.accounts = [];
+      const ref = collection(db, "accounts");
+      let q = query(ref, orderBy("prior"));
+      const docSnapBig = await getDocs(q);
+      docSnapBig.forEach(doc => {
+        this.accounts.push(doc.data().name);
+      });
+      this.accounts.unshift("");
+      // console.log(this.cates);
+    },
+
 
     async getCates() {
       this.cates = [];
