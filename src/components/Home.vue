@@ -1,18 +1,18 @@
 <template>
-  <div>
+  <div>    
     <v-row>
-      <v-col>
-        <v-card class="mx-auto" max-width="400">
+      <v-col v-for="card in cardData" :key="card.m">
+        <v-card  class="mx-auto" max-width="400">
           <v-list-item two-line>
             <v-list-item-content>
-              <v-list-item-title class="text-h5">本月支出</v-list-item-title>
+              <v-list-item-title class="text-h5">{{card.m}}月支出</v-list-item-title>
               <v-list-item-subtitle>Mon, 12:30 PM, Mostly sunny</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
 
           <v-card-text>
             <v-row align="center">
-              <v-col class="text-h2" cols="8">{{ rowsTotal[1]}}</v-col>
+              <v-col class="text-h2" cols="8">{{ card.total}}</v-col>
               <v-col cols="4">
                 <v-img
                   src="https://cdn.vuetifyjs.com/images/cards/sun.png"
@@ -51,30 +51,11 @@
             <v-list-item-subtitle class="subtitle-1">2,587</v-list-item-subtitle>
           </v-list-item>
 
-          <v-slider v-model="time" :max="6" :tick-labels="labels" class="mx-4" ticks></v-slider>
-          <v-slider v-model="time" :max="6" :tick-labels="labels2" class="mx-4" ticks></v-slider>
-
-          <v-list class="transparent">
-            <v-list-item v-for="item in forecast" :key="item.day">
-              <v-list-item-title>{{ item.day }}</v-list-item-title>
-
-              <v-list-item-icon>
-                <v-icon>{{ item.icon }}</v-icon>
-              </v-list-item-icon>
-
-              <v-list-item-subtitle class="text-right">{{ item.temp }}</v-list-item-subtitle>
-            </v-list-item>
-          </v-list>
-
-          <v-divider></v-divider>
-
-          <v-card-actions>
-            <v-btn text>Full Report</v-btn>
-          </v-card-actions>
+        
         </v-card>
       </v-col>
 
-      <v-col>
+      <!-- <v-col>
         <v-card class="mx-auto" max-width="344">
           <v-card-text>
             <div>上月支出</div>
@@ -89,8 +70,9 @@
             <v-btn text color="deep-purple accent-4">Learn More</v-btn>
           </v-card-actions>
         </v-card>
-      </v-col>
+      </v-col> -->
     </v-row>
+    
   </div>
 </template>
 
@@ -113,8 +95,9 @@ export default {
   data() {
     return {
       rows: [],
-      rowsTotal:[],
-      months:['06','07'],
+      rowsTotal: [],
+      cardData:[],
+      months: ["06", "07"],
       labels: ["日", "一", "TU", "WED", "TH", "FR", "SA"],
       labels2: ["180", "414", "TU", "WED", "TH", "FR", "SA"],
       time: 0,
@@ -138,12 +121,98 @@ export default {
     // this.getDataYM(y,m);
     // this.getDataYM2();
     //  this.rows = [];
-    this.getDataYM('2022','06');
-   this.getDataYM('2022','07');
+    //   this.getDataYM('2022','06');
+    //  this.getDataYM('2022','07');
+    this.getData();
   },
   methods: {
+    // 資料
+    async getData() {
+      let rows = [];
+      const ref = collection(db, "expenses");
+      let y = "2022";
+      let m = "06";
+      let m2 = "07";
+      const q = query(
+        ref,
+        where("spend_date", ">=", y + "-" + m + "-01"),
+        where("spend_date", "<=", y + "-" + m2 + "-31")
+      );
+
+      const docSnapBig = await getDocs(q);
+      docSnapBig.forEach(doc => {
+        rows.push({ ...doc.data() });
+      });
+
+      // 排除轉帳和投資
+      rows = rows.filter(row => row.trans_type != "轉帳");
+      rows = rows.filter(row => row.trans_type != "投資");
+
+      // 月份迴圈
+      let months = ["06", "07"];
+      let data = [];
+      months.forEach(m => {
+        let arrMonth = rows.filter(row =>
+          row.spend_date.startsWith("2022-" + m)
+        );
+        // 月份加總
+        let total = 0;
+        arrMonth.forEach(row => {
+          total += row.expense * 1;
+        });
+        // 類別
+        let cates = ["餐費", "日常用品"];
+        let detail = [];
+        cates.forEach(cate => {
+          let arrCate = arrMonth.filter(row => row.cate_name == cate);
+          let cateTotal = 0;
+          arrCate.forEach(t => {
+            cateTotal += t.expense * 1;
+          });
+          detail.push({ cate: cate, amt: cateTotal });
+          console.log(arrCate)
+        });
+        data.push({
+          m: m,
+          total: total,
+          detail: detail
+        });
+      });
+      this.cardData = data;
+      console.log(data);
+      // rows = rows.filter(row => row.spend_date.startsWith("2022-06"));
+
+      // 加總
+      // console.log(rows);
+      // let total = 0;
+      // rows.forEach(row => {
+      //   total += row.expense * 1;
+      // });
+      // let cates = ["餐費", "日常用品"];
+      // let arrCate = [];
+      // 篩選類別資料
+      // cates.forEach(cate => {
+      //   let temp = rows.filter(row => row.cate_name == cate);
+      //   let cateTotal = 0;
+      //   temp.forEach(t => {
+      //     cateTotal += t.expense * 1;
+      //   });
+      // arrCate.push({ cate: cate, amt: cateTotal });
+      // console.log(cate)
+      // });
+      // console.log(arrCate);
+      // let data = [
+      //   {
+      //     m: "06",
+      //     total: total,
+      //     detail: arrCate         
+      //   }
+      // ];
+
+      
+    },
     // 年月資料
-    async getDataYM(y,m) {
+    async getDataYM(y, m) {
       let rows = [];
       // let y = "2022";
       // let m = "06";
@@ -159,17 +228,17 @@ export default {
       const docSnapBig = await getDocs(q);
       docSnapBig.forEach(doc => {
         // this.rows.push({ ...doc.data(), id: doc.id });
-        rows.push( {...doc.data()} );
+        rows.push({ ...doc.data() });
       });
 
       // 排除轉帳和投資
       rows = rows.filter(row => row.trans_type != "轉帳");
       rows = rows.filter(row => row.trans_type != "投資");
-      let total = 0
-      rows.forEach(row=>{
-        total+=row.expense*1
-      })
-       // Create our number formatter.
+      let total = 0;
+      rows.forEach(row => {
+        total += row.expense * 1;
+      });
+      // Create our number formatter.
       var formatter = new Intl.NumberFormat("en-US", {
         // style: "currency",
         currency: "USD"
@@ -177,11 +246,10 @@ export default {
 
       total = formatter.format(total); /* $2,500.00 */
       // console.log(this.rows)
-      this.rowsTotal.push(total)
-      console.log(total)
+      this.rowsTotal.push(total);
+      console.log(total);
     },
     async getDataYM2() {
-     
       let y = "2022";
       let m = "07";
       const ref = collection(db, "expenses");
@@ -196,19 +264,19 @@ export default {
       const docSnapBig = await getDocs(q);
       docSnapBig.forEach(doc => {
         // this.rows.push({ ...doc.data(), id: doc.id });
-        this.rows.push( {...doc.data()} );
+        this.rows.push({ ...doc.data() });
       });
 
       // 排除轉帳和投資
       this.rows = this.rows.filter(row => row.trans_type != "轉帳");
       this.rows = this.rows.filter(row => row.trans_type != "投資");
-      let total = 0
-      this.rows.forEach(row=>{
-        total+=row.expense*1
-      })
-      console.log(this.rows)
-      this.rowsTotal.push(total)
-      console.log(total)
+      let total = 0;
+      this.rows.forEach(row => {
+        total += row.expense * 1;
+      });
+      console.log(this.rows);
+      this.rowsTotal.push(total);
+      console.log(total);
     },
     async getTotal() {}
   }
