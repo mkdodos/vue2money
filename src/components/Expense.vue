@@ -182,7 +182,7 @@ export default {
         // { text: "帳戶", value: "account_name", width: "50" },
         // { text: "日期", value: "spend_date", width: "0" },
         // { text: "類別", value: "cate_name", width: "100" },
-        { text: "項目", value: "note", width: "180" },
+        { text: "項目", value: "note", width: "120" },
         { text: "abc", value: "expense", width: "60" }
         // { text: "type", value: "trans_type" }
         // { text: "", value: "actions" }
@@ -252,6 +252,7 @@ export default {
     // 本月資料
     async getRowsMonth() {
       this.rowsMonth = [];
+      this.rowsMonthCates = [];
       let m = new Date().getMonth() + 1;
       // let m = 6;
       if (m < 10) {
@@ -282,7 +283,7 @@ export default {
       // 改用 javascript 的 filter
       this.rowsMonth = this.rowsMonth.filter(row => row.trans_type != "轉帳");
       this.rowsMonth = this.rowsMonth.filter(row => row.trans_type != "投資");
-      console.log(this.rowsMonth);
+      // console.log(this.rowsMonth);
       // 統計該月每個分類金額
       this.cates.forEach(cate => {
         // 篩選資料
@@ -396,6 +397,7 @@ export default {
         this.$nextTick(() => {
           //  更新現金帳戶餘額
           this.getBalance();
+          this.getRowsMonth();
           // 將表單的值設成預設值
           this.defaultItem.date = "";
           this.editedItem = Object.assign({}, this.defaultItem);
