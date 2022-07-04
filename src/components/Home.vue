@@ -1,8 +1,8 @@
 <template>
-  <div>    
+  <div>
     <v-row>
       <v-col v-for="card in cardData" :key="card.m">
-        <v-card  class="mx-auto" max-width="400">
+        <v-card class="mx-auto" max-width="400">
           <v-list-item two-line>
             <v-list-item-content>
               <v-list-item-title class="text-h5">{{card.m}}月支出</v-list-item-title>
@@ -23,14 +23,16 @@
             </v-row>
           </v-card-text>
 
-          <v-list-item>
-            <v-list-item-icon>
+          <!-- detail -->
+
+          <v-list-item v-for="d in card.detail" :key="d.cate">
+            <!-- <v-list-item-icon>
               <v-icon>mdi-home-analytics</v-icon>
-            </v-list-item-icon>
-            <v-list-item-subtitle class="subtitle-1">17,891</v-list-item-subtitle>
+            </v-list-item-icon> -->
+            <v-list-item-subtitle class="subtitle-1">{{ d.cate}} : {{ d.amt}}</v-list-item-subtitle>
           </v-list-item>
 
-          <v-list-item>
+          <!-- <v-list-item>
             <v-list-item-icon>
               <v-icon>mdi-car</v-icon>
             </v-list-item-icon>
@@ -49,9 +51,7 @@
               <v-icon>mdi-tree-outline</v-icon>
             </v-list-item-icon>
             <v-list-item-subtitle class="subtitle-1">2,587</v-list-item-subtitle>
-          </v-list-item>
-
-        
+          </v-list-item> -->
         </v-card>
       </v-col>
 
@@ -70,9 +70,8 @@
             <v-btn text color="deep-purple accent-4">Learn More</v-btn>
           </v-card-actions>
         </v-card>
-      </v-col> -->
+      </v-col>-->
     </v-row>
-    
   </div>
 </template>
 
@@ -96,7 +95,8 @@ export default {
     return {
       rows: [],
       rowsTotal: [],
-      cardData:[],
+      cates:[],
+      cardData: [],
       months: ["06", "07"],
       labels: ["日", "一", "TU", "WED", "TH", "FR", "SA"],
       labels2: ["180", "414", "TU", "WED", "TH", "FR", "SA"],
@@ -123,9 +123,18 @@ export default {
     //  this.rows = [];
     //   this.getDataYM('2022','06');
     //  this.getDataYM('2022','07');
+    this.getCates()
     this.getData();
   },
   methods: {
+    // 類別
+    async getCates() {
+      const ref = collection(db, "cates");
+      const docs = await getDocs(ref)
+      docs.forEach(doc=>{
+        this.cates.push(doc.data().name)
+      })      
+    },
     // 資料
     async getData() {
       let rows = [];
@@ -161,16 +170,20 @@ export default {
           total += row.expense * 1;
         });
         // 類別
-        let cates = ["餐費", "日常用品"];
+        // let cates = ["餐費", "日常用品"];
+
         let detail = [];
-        cates.forEach(cate => {
+        this.cates.forEach(cate => {
+          console.log(cate)
           let arrCate = arrMonth.filter(row => row.cate_name == cate);
           let cateTotal = 0;
           arrCate.forEach(t => {
             cateTotal += t.expense * 1;
           });
+          // 明細
+          if(cateTotal>0)
           detail.push({ cate: cate, amt: cateTotal });
-          console.log(arrCate)
+          console.log(arrCate);
         });
         data.push({
           m: m,
@@ -205,11 +218,9 @@ export default {
       //   {
       //     m: "06",
       //     total: total,
-      //     detail: arrCate         
+      //     detail: arrCate
       //   }
       // ];
-
-      
     },
     // 年月資料
     async getDataYM(y, m) {
