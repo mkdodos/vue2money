@@ -24,6 +24,16 @@ export default {
     // BarChart
   },
 
+  methods: {
+     // 數字格式
+    // numFormat(num) {
+    //   var formatter = new Intl.NumberFormat("en-US", { 
+    //     currency: "USD"
+    //   });
+    //   return  formatter.format(num); /* $2,500.00 */
+    // },   
+  },
+
   // data() {
   //   return {
   //     user: null

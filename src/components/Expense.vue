@@ -54,14 +54,8 @@
       <v-col cols="12">
         <v-text-field label v-model="search" append-icon="mdi-magnify"></v-text-field>
       </v-col>
-      <!-- <v-col cols="4">
-        <v-btn color="cyan" class="white--text" @click="queryRows">
-          查詢
-          <v-icon right>mdi-magnify</v-icon>
-        </v-btn>
-      </v-col>-->
     </v-row>
-
+    <!-- 切換日期 -->
     <v-row justify="space-between" class="mb-3">
       <v-col cols="4">
         <v-btn color="cyan" class="white--text" @click="preDay">
@@ -84,15 +78,15 @@
       <v-card-title>
         <v-row class="mb-1" cols="3" justify="space-between">
           <v-col @click="nextDay">{{ new Date(today).toISOString().slice(5, 10)}}</v-col>
-          <!-- 合計 -->
+          <!-- 現金餘額 -->
           <v-col cols="4">
             <v-icon left>mdi-currency-usd</v-icon>
-            {{ getTotal(rows) }}
+            {{ numFormat(balance) }}
           </v-col>
           <!-- 月合計 -->
           <v-col @click="dialogType=true" cols="5">
             <v-icon left>mdi-calendar</v-icon>
-            {{ getTotal(rowsMonth) }}
+            {{ numFormat(getTotal(rowsMonth)) }}
           </v-col>
         </v-row>
       </v-card-title>
@@ -108,6 +102,11 @@
           :search="search"
           @click:row="editItem"
         >
+
+ <template v-slot:header.expense="{  }">
+      日合計 : {{ numFormat(getTotal(rows)) }}
+    </template>
+
           <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(0,10) }}</template>
           <template v-slot:item.actions="{ item }">
             <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
@@ -151,8 +150,19 @@ export default {
   // watch:{rowsMonth:{
   //   handler:getTotal()
   // }},
+
+   watch: {
+    // whenever question changes, this function will run
+    rows() {
+      // if (newQuestion.indexOf('?') > -1) {
+        this.getBalance()
+      // }
+    }
+  },
   data() {
     return {
+      // 帳戶餘額
+      balance:0,
       // 月資料
       rowsMonth: [],
       // 月資料依類別
@@ -165,9 +175,8 @@ export default {
         // { text: "帳戶", value: "account_name", width: "50" },
         // { text: "日期", value: "spend_date", width: "0" },
         // { text: "類別", value: "cate_name", width: "100" },
-        { text: "項目", value: "note", width: "180" },
-        // { text: "收入", value: "income" },
-        { text: "金額", value: "expense", width: "60" },
+        { text: "項目", value: "note", width: "180" },       
+        { text: "abc", value: "expense", width: "60" },
         // { text: "type", value: "trans_type" }
         // { text: "", value: "actions" }
       ],
@@ -202,24 +211,54 @@ export default {
     this.getMoney();
     this.getCates();
     this.getRowsMonth();
-    // console.log(this.rows[0])
+    this.getBalance()
   },
   methods: {
+    // 帳戶餘額
+    async getBalance() {
+      // let accountData = [];
+      const expenses = collection(db, "expenses");
+      let q = query(expenses, where("account_name", "==", "現金"));
+      const docSnapBig = await getDocs(q);
+      let income = 0;
+      let expense = 0;
+      docSnapBig.forEach(doc => {   
+        if(doc.data().income)
+        income+=doc.data().income*1    
+        if(doc.data().expense)
+        expense+=doc.data().expense*1
+        // accountData.push({ ...doc.data() });
+      }); 
+      this.balance = income - expense
+      // let income = 0 ;
+      // let expense = 0 ;
+      // console.log(income)
+      // console.log(expense)
+      // console.log(income-expense)
+      // return income-expense;
+    },
+    // 數字格式
+    numFormat(num) {
+      var formatter = new Intl.NumberFormat("en-US", {
+        currency: "USD"
+      });
+      return formatter.format(num); /* $2,500.00 */
+    },
     // 本月資料
     async getRowsMonth() {
       this.rowsMonth = [];
-      // let m = new Date().getMonth()+1;
-      let m = 6;
-      if(m<10){
-        m='0'+m;
+      let m = new Date().getMonth() + 1;
+      // let m = 6;
+      if (m < 10) {
+        m = "0" + m;
       }
-      console.log(m)
+      console.log(m);
       const citiesCol = collection(db, collection_name);
       const q = query(
         citiesCol,
         orderBy("spend_date", "desc"),
-        where("spend_date", ">=", "2022-"+m+"-01"),
-        where("spend_date", "<=", "2022-"+m+"-31")
+        where("spend_date", ">=", "2022-" + m + "-01"),
+        where("spend_date", "<=", "2022-" + m + "-31")
         // where("trans_type","==","一般"),
       );
 
@@ -350,7 +389,9 @@ export default {
         Object.assign(this.rowsMonth[this.editedIndex], this.editedItem);
 
         this.$nextTick(() => {
-          // 將表單的值設成預設值
+        //  更新現金帳戶餘額
+          this.getBalance()
+           // 將表單的值設成預設值
           this.defaultItem.date = "";
           this.editedItem = Object.assign({}, this.defaultItem);
           this.editedIndex = -1;

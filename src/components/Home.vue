@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-row>
-      <v-col cols="4" v-for="card in cardData" :key="card.m">
+      <v-col cols="6" v-for="card in cardData" :key="card.m">
         <v-card class="mx-auto" max-width="400">
           <v-list-item two-line>
             <v-list-item-content>
