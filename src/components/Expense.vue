@@ -76,12 +76,13 @@
 
     <v-card>
       <v-card-title>
-        <v-row class="mb-1" cols="3" justify="space-between">
-          <v-col @click="nextDay">{{ new Date(today).toISOString().slice(5, 10)}}</v-col>
+        
+        <v-row justify="space-between" class="mb-1">
+          
           <!-- 現金餘額 -->
-          <v-col cols="4">
-            <v-icon left>mdi-currency-usd</v-icon>
-            {{ numFormat(balance) }}
+          <v-col>
+            <!-- <v-icon left>mdi-currency-usd</v-icon> -->
+            現金 {{ numFormat(balance) }}
           </v-col>
           <!-- 月合計 -->
           <v-col @click="dialogType=true" cols="5">
@@ -89,8 +90,16 @@
             {{ numFormat(getTotal(rowsMonth)) }}
           </v-col>
         </v-row>
+       
       </v-card-title>
       <v-card-text>
+       
+        <v-row>
+          <!-- 日期 -->
+          <!-- <v-col>{{ new Date(today).toISOString().slice(5, 10)}}</v-col> -->
+          
+        </v-row>
+       
         <!-- 表格 -->
         <v-data-table
           :items-per-page="100"
@@ -102,10 +111,8 @@
           :search="search"
           @click:row="editItem"
         >
-
- <template v-slot:header.expense="{  }">
-      日合計 : {{ numFormat(getTotal(rows)) }}
-    </template>
+          <template v-slot:header.note="{  }"> {{ new Date(today).toISOString().slice(5, 10) }}</template>
+          <template v-slot:header.expense="{  }"> {{ numFormat(getTotal(rows)) }}</template>
 
           <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(0,10) }}</template>
           <template v-slot:item.actions="{ item }">
@@ -151,18 +158,18 @@ export default {
   //   handler:getTotal()
   // }},
 
-   watch: {
+  watch: {
     // whenever question changes, this function will run
     rows() {
       // if (newQuestion.indexOf('?') > -1) {
-        this.getBalance()
+      this.getBalance();
       // }
     }
   },
   data() {
     return {
       // 帳戶餘額
-      balance:0,
+      balance: 0,
       // 月資料
       rowsMonth: [],
       // 月資料依類別
@@ -175,8 +182,8 @@ export default {
         // { text: "帳戶", value: "account_name", width: "50" },
         // { text: "日期", value: "spend_date", width: "0" },
         // { text: "類別", value: "cate_name", width: "100" },
-        { text: "項目", value: "note", width: "180" },       
-        { text: "abc", value: "expense", width: "60" },
+        { text: "項目", value: "note", width: "180" },
+        { text: "abc", value: "expense", width: "60" }
         // { text: "type", value: "trans_type" }
         // { text: "", value: "actions" }
       ],
@@ -211,7 +218,7 @@ export default {
     this.getMoney();
     this.getCates();
     this.getRowsMonth();
-    this.getBalance()
+    this.getBalance();
   },
   methods: {
     // 帳戶餘額
@@ -222,14 +229,12 @@ export default {
       const docSnapBig = await getDocs(q);
       let income = 0;
       let expense = 0;
-      docSnapBig.forEach(doc => {   
-        if(doc.data().income)
-        income+=doc.data().income*1    
-        if(doc.data().expense)
-        expense+=doc.data().expense*1
+      docSnapBig.forEach(doc => {
+        if (doc.data().income) income += doc.data().income * 1;
+        if (doc.data().expense) expense += doc.data().expense * 1;
         // accountData.push({ ...doc.data() });
-      }); 
-      this.balance = income - expense
+      });
+      this.balance = income - expense;
       // let income = 0 ;
       // let expense = 0 ;
       // console.log(income)
@@ -389,9 +394,9 @@ export default {
         Object.assign(this.rowsMonth[this.editedIndex], this.editedItem);
 
         this.$nextTick(() => {
-        //  更新現金帳戶餘額
-          this.getBalance()
-           // 將表單的值設成預設值
+          //  更新現金帳戶餘額
+          this.getBalance();
+          // 將表單的值設成預設值
           this.defaultItem.date = "";
           this.editedItem = Object.assign({}, this.defaultItem);
           this.editedIndex = -1;
