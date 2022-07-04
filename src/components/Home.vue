@@ -1,24 +1,25 @@
 <template>
   <div>
     <v-row>
-      <v-col v-for="card in cardData" :key="card.m">
+      <v-col cols="4" v-for="card in cardData" :key="card.m">
         <v-card class="mx-auto" max-width="400">
           <v-list-item two-line>
             <v-list-item-content>
               <v-list-item-title class="text-h5">{{card.m}}月支出</v-list-item-title>
-              <v-list-item-subtitle>Mon, 12:30 PM, Mostly sunny</v-list-item-subtitle>
+              <!-- <v-list-item-subtitle>Mon, 12:30 PM, Mostly sunny</v-list-item-subtitle> -->
             </v-list-item-content>
           </v-list-item>
 
           <v-card-text>
             <v-row align="center">
-              <v-col class="text-h2" cols="8">{{ card.total}}</v-col>
+              <v-col class="text-h2" cols="8">{{ numFormat(card.total)}}</v-col>
               <v-col cols="4">
-                <v-img
-                  src="https://cdn.vuetifyjs.com/images/cards/sun.png"
+                <v-icon large color="green darken-2">mdi-domain</v-icon>
+                <!-- <v-img
+                  src="https://nitro-admin.netlify.app/assets/logo.a0fb346a.svg"
                   alt="Sunny image"
                   width="82"
-                ></v-img>
+                ></v-img>-->
               </v-col>
             </v-row>
           </v-card-text>
@@ -26,10 +27,11 @@
           <!-- detail -->
 
           <v-list-item v-for="d in card.detail" :key="d.cate">
-            <!-- <v-list-item-icon>
+            <v-list-item-icon>
               <v-icon>mdi-home-analytics</v-icon>
-            </v-list-item-icon> -->
-            <v-list-item-subtitle class="subtitle-1">{{ d.cate}} : {{ d.amt}}</v-list-item-subtitle>
+            </v-list-item-icon>
+            <!-- <v-icon color="green darken-2">mdi-domain</v-icon> -->
+            <v-list-item-subtitle class="subtitle-1">{{ d.cate}} : {{ numFormat(d.amt)}}</v-list-item-subtitle>
           </v-list-item>
 
           <!-- <v-list-item>
@@ -51,7 +53,7 @@
               <v-icon>mdi-tree-outline</v-icon>
             </v-list-item-icon>
             <v-list-item-subtitle class="subtitle-1">2,587</v-list-item-subtitle>
-          </v-list-item> -->
+          </v-list-item>-->
         </v-card>
       </v-col>
 
@@ -95,7 +97,7 @@ export default {
     return {
       rows: [],
       rowsTotal: [],
-      cates:[],
+      cates: [],
       cardData: [],
       months: ["06", "07"],
       labels: ["日", "一", "TU", "WED", "TH", "FR", "SA"],
@@ -123,25 +125,32 @@ export default {
     //  this.rows = [];
     //   this.getDataYM('2022','06');
     //  this.getDataYM('2022','07');
-    this.getCates()
+    this.getCates();
     this.getData();
   },
   methods: {
+    // 數字格式
+    numFormat(num) {
+      var formatter = new Intl.NumberFormat("en-US", { 
+        currency: "USD"
+      });
+      return  formatter.format(num); /* $2,500.00 */
+    },
     // 類別
     async getCates() {
       const ref = collection(db, "cates");
-      const docs = await getDocs(ref)
-      docs.forEach(doc=>{
-        this.cates.push(doc.data().name)
-      })      
+      const docs = await getDocs(ref);
+      docs.forEach(doc => {
+        this.cates.push(doc.data().name);
+      });
     },
     // 資料
     async getData() {
       let rows = [];
       const ref = collection(db, "expenses");
       let y = "2022";
-      let m = "06";
-      let m2 = "07";
+      let m = "01";
+      let m2 = "12";
       const q = query(
         ref,
         where("spend_date", ">=", y + "-" + m + "-01"),
@@ -158,7 +167,13 @@ export default {
       rows = rows.filter(row => row.trans_type != "投資");
 
       // 月份迴圈
-      let months = ["06", "07"];
+      let months = [];
+      for(let i = 1;i<=12;i++){
+        if(i<10)
+        months.push('0'+i)
+        else
+        months.push(i)
+      }
       let data = [];
       months.forEach(m => {
         let arrMonth = rows.filter(row =>
@@ -174,19 +189,20 @@ export default {
 
         let detail = [];
         this.cates.forEach(cate => {
-          console.log(cate)
+          console.log(cate);
           let arrCate = arrMonth.filter(row => row.cate_name == cate);
           let cateTotal = 0;
           arrCate.forEach(t => {
             cateTotal += t.expense * 1;
           });
           // 明細
-          if(cateTotal>0)
-          detail.push({ cate: cate, amt: cateTotal });
+          if (cateTotal > 0) detail.push({ cate: cate, amt: cateTotal });
           console.log(arrCate);
         });
-        data.push({
-          m: m,
+        // m*1 把 01 變 1
+        if(total>0)
+        data.unshift({
+          m: m*1,
           total: total,
           detail: detail
         });

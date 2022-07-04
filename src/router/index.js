@@ -20,7 +20,7 @@ import Home from '../components/Home.vue';
 
 import '../firebase/init';
 
-import { getAuth } from 'firebase/auth';
+// import { getAuth } from 'firebase/auth';
 
 const router = new VueRouter({
   mode: 'history',
@@ -76,30 +76,18 @@ const router = new VueRouter({
   ],
 });
 
-router.beforeEach((to, from, next) => {
-  const auth = getAuth();
-  const user = auth.currentUser;
-  // if(user){
-  //     next()
-  // }
-  // const isLogin = localStorage.getItem('token') == user.uid ;
-     if(user){
-      next();
-     }else if(to.path !== '/login'){
-      next('/login');
-     }else{
-      next();
-     }
+// router.beforeEach((to, from, next) => {
+  // const auth = getAuth();
+  // const user = auth.currentUser;  
+  //    if(user){
+  //     next();
+  //    }else if(to.path !== '/login'){
+  //     next('/login');
+  //    }else{
+  //     next();
+  //    }
 
-//   if (user) {
-//     next();
-//   } else {
-//     if (to.path !== '/login') {
-//       next('/login');
-//     } else {
-//       next();
-//     }
-//   }
+
 
   // 路由中有包含此值,就導向登入頁
   // const auth = getAuth();
@@ -111,6 +99,6 @@ router.beforeEach((to, from, next) => {
   //     next()
   // else
   //     next()
-});
+// });
 
 export default router;
