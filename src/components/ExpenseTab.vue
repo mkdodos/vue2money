@@ -3,21 +3,33 @@
     <!-- 編輯表單 -->
     <v-dialog v-model="dialog" width="500">
       <v-card>
-        <v-card-title class="text-h5 lighten-2">編輯</v-card-title>
+        <v-card-title class="text-h5 lighten-2">
+         <v-row justify="space-between">
+          <v-col cols="4"> 編輯</v-col>
+          <!-- <v-col></v-col> -->
+          <v-col cols="2"> <v-btn icon @click="dialog = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn></v-col>
+         </v-row>
+         
+          
+        </v-card-title>
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="4" sm="4" md="4">
+              <v-col>
                 <v-text-field label="日期" v-model="editedItem.spend_date" type="date"></v-text-field>
               </v-col>
+              <v-col>
+                <v-select :items="types" v-model="editedItem.trans_type" label="類型"></v-select>
+              </v-col>
+            </v-row>
+            <v-row>
               <v-col>
                 <v-radio-group row v-model="incomeOrExpense">
                   <v-radio color="red" value="income" label="收入"></v-radio>
                   <v-radio value="expense" label="支出"></v-radio>
                 </v-radio-group>
-              </v-col>
-              <v-col cols="2" sm="2" md="3">
-                <v-select :items="types" v-model="editedItem.trans_type" label="type"></v-select>
               </v-col>
             </v-row>
             <v-row>
@@ -114,21 +126,24 @@
     </v-row>
 
     <!-- <editDialog :rows="rows" /> -->
-    <v-btn @click="openDialog" color="blue-grey" class="white--text">新增</v-btn>
+
     <!-- 表格 -->
-    <v-row>
-      <v-col cols="6"></v-col>
+    <v-row justify="space-between">
+      <!-- <v-col cols="6"></v-col> -->
       <!-- 合計 -->
-      <v-col cols="2" sm="2">
+      <!-- <v-col>
         <v-btn outlined color="red" dark>{{ getTotalIncome(rows) }}</v-btn>
+      </v-col>-->
+      <v-col cols="4">
+        <v-btn @click="openDialog" color="blue-grey" class="white--text">新增</v-btn>
       </v-col>
-      <v-col cols="2">
+      <v-col cols="4">
         <v-btn outlined color="blue" dark>{{ getTotal(rows) }}</v-btn>
       </v-col>
 
-      <v-col cols="2">
+      <!-- <v-col>
         <v-btn outlined color="green" dark>{{ getBalance(rows) }}</v-btn>
-      </v-col>
+      </v-col>-->
     </v-row>
     <!-- <v-row> -->
     <!-- <v-col cols="2"></v-col> -->
@@ -207,10 +222,8 @@ export default {
         { text: "日期", value: "spend_date", width: "70" },
         // { text: "帳戶", value: "account_name", width: "100" },
 
-        
-
         { text: "項目", value: "note", width: "120" },
-        { text: "收入", value: "income", width: "90" },
+
         { text: "支出", value: "expense", width: "70" }
       ],
       loading: false,
@@ -229,17 +242,19 @@ export default {
     // 切換欄位顯示
     switchCols() {
       let account = { text: "帳戶", value: "account_name", width: "60" };
+      let income = { text: "收入", value: "income", width: "90" };
       let cate = { text: "分類", value: "cate_name", width: "60" };
-      let type = { text: "type", value: "trans_type", width: "60" }
+      let type = { text: "type", value: "trans_type", width: "60" };
       // 加入欄位
       if (!this.switchColsFlag) {
         this.headers.splice(0, 0, type);
+        this.headers.splice(0, 0, income);
         this.headers.splice(0, 0, cate);
         this.headers.splice(0, 0, account);
-        
       }
       // 移除欄位
       else {
+        this.headers.splice(0, 1);
         this.headers.splice(0, 1);
         this.headers.splice(0, 1);
         this.headers.splice(0, 1);
@@ -395,8 +410,7 @@ export default {
       this.dialog = false;
     },
 
-
-async getAccounts() {
+    async getAccounts() {
       this.accounts = [];
       const ref = collection(db, "accounts");
       let q = query(ref, orderBy("prior"));
@@ -407,7 +421,6 @@ async getAccounts() {
       this.accounts.unshift("");
       // console.log(this.cates);
     },
-
 
     async getCates() {
       this.cates = [];
@@ -499,13 +512,9 @@ async getAccounts() {
 
       if (m != null && m != "") {
         // queryConstraints.push( orderBy("spend_date", "desc"))
-        queryConstraints.push(
-          where("spend_date", ">=", y + "-" + m + "-01")
-        );
+        queryConstraints.push(where("spend_date", ">=", y + "-" + m + "-01"));
 
-        queryConstraints.push(
-          where("spend_date", "<=", y + "-" + m + "-31")
-        );
+        queryConstraints.push(where("spend_date", "<=", y + "-" + m + "-31"));
       }
 
       if (cate != null && cate != "")
@@ -523,6 +532,9 @@ async getAccounts() {
       docSnapBig.forEach(doc => {
         this.rows.push({ ...doc.data(), id: doc.id });
       });
+
+      this.rows = this.rows.filter(row => row.trans_type != "轉帳");
+      this.rows = this.rows.filter(row => row.trans_type != "投資");
       this.loading = false;
     }
   }

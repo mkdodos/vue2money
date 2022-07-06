@@ -13,10 +13,10 @@ Vue.config.productionTip = false;
 Vue.use(VueRouter);
 let app;
 import { getAuth } from 'firebase/auth';
-getAuth().onAuthStateChanged((user) => {
+getAuth().onAuthStateChanged(() => {
   // 做此判斷,避免登入後,重新整理又回到登入頁
   if (!app) {
-    console.log(user);
+    // console.log(user);
     app = new Vue({
       // Chart,
       vuetify,
