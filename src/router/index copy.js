@@ -40,14 +40,10 @@ const router = new VueRouter({
       name: 'ExpenseDetail',
       path: '/expense/detail',
       component: ExpenseDetail,
-      
     },
     { name: 'ExpenseGas', path: '/expense/gas', component: ExpenseGas },
     { name: 'ExpenseDada', path: '/expense/dada', component: ExpenseDada },
-    { name: 'ExpenseTab', path: '/expense-tab', component: ExpenseTab ,
-    meta: { requiresAuth: true },
-  
-  },
+    { name: 'ExpenseTab', path: '/expense-tab', component: ExpenseTab },
     { name: 'SpendTab', path: '/spend-tab', component: SpendTab },
     { name: 'CashIn', path: '/cash-in', component: CashIn },
     { name: 'Login', path: '/login', component: Login },
@@ -63,26 +59,46 @@ const router = new VueRouter({
       meta: { requiresAuth: true },
       component: StockTransaction,
     },
+    // {
+    //   path: '/',
+    //   components: {
+    //     default: Home,
+    //     nav: Toolbar,
+    //   },
+    // },
+    // {
+    //   path: '/views/balance',
+    //   components: {
+    //     default: Balance,
+    //     nav: Toolbar,
+    //   },
+    // },
   ],
 });
 
+// router.beforeEach((to, from, next) => {
+  // const auth = getAuth();
+  // const user = auth.currentUser;  
+  //    if(user){
+  //     next();
+  //    }else if(to.path !== '/login'){
+  //     next('/login');
+  //    }else{
+  //     next();
+  //    }
 
-import { getAuth } from 'firebase/auth';
 
-  router.beforeEach((to, from, next)=>{
-    const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-    const user = getAuth().currentUser;
-    if(requiresAuth && !user){
-      next('/login')
-    }else{
-      next()
-    }
-  })
+
   // 路由中有包含此值,就導向登入頁
   // const auth = getAuth();
   // const user = auth.currentUser;
-  
-  
-
+  // const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  // if (requiresAuth && !user)
+  //     next('/login')
+  // else if (requiresAuth && user)
+  //     next()
+  // else
+  //     next()
+// });
 
 export default router;

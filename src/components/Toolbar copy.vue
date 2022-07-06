@@ -1,56 +1,60 @@
 <template>
   <div>
     <v-toolbar dense>
+     
+
       <v-menu offset-y>
         <template v-slot:activator="{ on, attrs }">
-          <v-app-bar-nav-icon v-bind="attrs" v-on="on"></v-app-bar-nav-icon>
-
+      
+      
+      <v-app-bar-nav-icon v-bind="attrs" v-on="on"></v-app-bar-nav-icon>
+      
           <!-- <v-btn color="primary" dark v-bind="attrs" v-on="on">Dropdown</v-btn> -->
         </template>
-        <!-- 下拉 -->
+<!-- 下拉 -->
         <v-list>
-          <v-list-item>
+          <v-list-item >
             <v-list-item-title>
               <v-btn to="/expense" text>支出</v-btn>
             </v-list-item-title>
           </v-list-item>
-          <v-list-item>
+          <v-list-item >
             <v-list-item-title>
               <v-btn to="/cate" text>Cate</v-btn>
             </v-list-item-title>
           </v-list-item>
-          <v-list-item>
+          <v-list-item >
             <v-list-item-title>
               <v-btn to="/spend" text>Spend</v-btn>
             </v-list-item-title>
           </v-list-item>
-          <v-list-item>
+          <v-list-item >
             <v-list-item-title>
               <v-btn to="/spend-tab" text>SpendTab</v-btn>
             </v-list-item-title>
           </v-list-item>
-          <v-list-item>
+           <v-list-item >
             <v-list-item-title>
               <v-btn to="/cash-in" text>Cash In</v-btn>
             </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
-      <v-btn to="/" text>H</v-btn>
-      <v-btn to="/account" text>帳戶</v-btn>
-      <v-btn to="/expense" text>支出</v-btn>
-      <v-btn to="/expense-tab" text>支出明細</v-btn>
-      <v-btn to="/expense/gas" text>加油</v-btn>
-      <v-btn to="/views/balance" text>收支</v-btn>
+       <v-btn to="/" text>H</v-btn>
+       <v-btn to="/account" text>帳戶</v-btn>
+       <v-btn to="/expense" text>支出</v-btn>
+       <v-btn to="/expense-tab" text>支出明細</v-btn>
+       <v-btn to="/expense/gas" text>加油</v-btn>
+       <v-btn v-if="email" to="/views/balance" text>收支</v-btn>
+     
+ <v-btn  @click="logout" text >登出</v-btn>
 
-      <v-btn v-if="loggedIn" @click="logout" text>登出</v-btn>
-
-      <!-- <v-btn to="/cash-in" text>Cash In</v-btn> -->
-      <!-- <v-btn to="/spend" text>Spend</v-btn>
-      <v-btn to="/spend-tab" text>SpendTab</v-btn>-->
-      <!-- <a href="" @click.prevent="logout">Logout</a> -->
-      {{user.email}}
-      <!-- {{ localStorage.getItem('email') }} -->
+       <!-- <v-btn to="/cash-in" text>Cash In</v-btn> -->
+       <!-- <v-btn to="/spend" text>Spend</v-btn>
+      <v-btn to="/spend-tab" text>SpendTab</v-btn> -->
+       <!-- <a href="" @click.prevent="logout">Logout</a> -->
+       {{user}}
+       <!-- {{ localStorage.getItem('email') }} -->
     </v-toolbar>
   </div>
 </template>
@@ -69,46 +73,44 @@ const firebaseConfig = {
 
 initializeApp(firebaseConfig);
 import { getAuth, signOut } from "firebase/auth";
+import {mapGetters} from 'vuex'
 const auth = getAuth();
 
 export default {
   data() {
-    return {      
-      user: {},
-      loggedIn: false
-    };
+    return {
+      email: '',
+      isLogin: localStorage.getItem('email')
+    }
+  },
+  watch:{
+    isLogin(){
+      console.log('ddd')
+    }
   },
   created() {
-      this.setupFirebase();
-    // if (auth.currentUser) {
-    //   console.log(auth.currentUser.email);
-    //   this.user = auth.currentUser;
+    
+    // let token = localStorage.getItem('token')
+    this.email = localStorage.getItem('email')
+    // if(localStorage.getItem('email')){
+    //   this.isLogin = true
     // }
+    // console.log(email)
+    // const auth = getAuth();
+    // console.log(auth.currentUser.uid)
   },
-
-  computed: {},
+  computed: {
+    ...mapGetters(['user'])
+  },
   methods: {
-    setupFirebase() {
-      // 登入登出狀態有改變時,依此做一些設定(顯示登出鈕和使用者email)
-      auth.onAuthStateChanged(user => {
-        if (user) {
-          // User is signed in.
-          // console.log("signed in");
-          this.loggedIn = true;
-          this.user = user
-        } else {
-          // No user is signed in.
-          this.loggedIn = false;
-          this.user = {}
-          // console.log("signed out", this.loggedIn);
-        }
-      });
-    },
-
     // 登出
-    async logout() {
+  async logout() {
       console.log("log");
       await signOut(auth).then(() => {
+         localStorage.removeItem('token');
+         localStorage.removeItem('email');
+        //  this.$store.dispatch('user',null)
+         this.isLogin = false
         // 轉址
         this.$router.replace("/login");
       });

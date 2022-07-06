@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <Toolbar />
-
+    <!-- <Books /> -->
     <v-main>
       <v-container>
         <router-view name="nav"></router-view>
@@ -12,6 +12,7 @@
 </template>
 
 <script>
+// import Books from "./components/Books";
 // import { getAuth } from "firebase/auth";
 // import HelloWorld from './components/HelloWorld';
 import Toolbar from "./components/Toolbar";
@@ -20,18 +21,19 @@ export default {
   name: "App",
 
   components: {
-    Toolbar
+    Toolbar,
+    // Books
     // BarChart
   },
 
   methods: {
-     // 數字格式
+    // 數字格式
     // numFormat(num) {
-    //   var formatter = new Intl.NumberFormat("en-US", { 
+    //   var formatter = new Intl.NumberFormat("en-US", {
     //     currency: "USD"
     //   });
     //   return  formatter.format(num); /* $2,500.00 */
-    // },   
+    // },
   },
 
   // data() {
@@ -39,7 +41,7 @@ export default {
   //     user: null
   //   };
   // },
-   created() {
+  created() {
     //  this.$store.dispatch('user',localStorage.getItem("email"))
     // const auth =  getAuth();
     // this.user = auth.currentUser.email;

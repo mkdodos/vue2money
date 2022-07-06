@@ -21,9 +21,12 @@
 
 <script>
 import "../firebase/init";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-const auth = getAuth();
 
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
+const auth = getAuth();
+// let email = "mk123@gmail.com";
+// let password = "123456";
 
 export default {
   data() {
@@ -34,13 +37,34 @@ export default {
   },
   methods: {
      login() {
-      // 登入後轉址
-      signInWithEmailAndPassword(auth, this.email, this.password)
-        .then(() => {
-            // console.log(userCredential)
-            this.$router.replace("/");
+      // firebase 登入
+       signInWithEmailAndPassword(auth, this.email, this.password)
+        .then(userCredential => {
+          // 轉址
+          // this.$router.push('/');
+          // if(userCredential){
+
+            
+          const user = userCredential.user;
+          
+          // 記錄使用者 ID
+          localStorage.setItem('token', user.uid)
+          localStorage.setItem('email', user.email)
+          // this.$store.dispatch('user','123')
+          console.log(user.uid);
+          // this.$router.push("stock-transaction");
+          this.$router.replace("/");
+          //  }
+
+          // else
+          // alert('error')
+          // this.$router.replace("stock-transaction");
         })
-      
+        .catch(error => {
+          // const errorCode = error.code;
+          // const errorMessage = error.message;
+          alert(error.message)
+        });
     }
   }
 };

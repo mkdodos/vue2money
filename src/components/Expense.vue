@@ -62,23 +62,25 @@
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
       </v-col>
+      <!-- <v-col>
+        <v-btn class="ma-2" color="red" dark>
+          Decline
+          <v-icon dark right>mdi-cancel</v-icon>
+        </v-btn>
+      </v-col> -->
       <v-col cols="4">
         <v-btn color="cyan" class="white--text" @click="nextDay">
           <v-icon>mdi-arrow-right</v-icon>
         </v-btn>
       </v-col>
       <v-col cols="4">
-        <!-- <v-btn color="cyan" class="white--text" @click="openDialog">新增</v-btn> -->
-        <!-- <v-btn @click="openDialog" color="blue-grey" class="ma-2 white--text"> -->
         <v-btn @click="openDialog" color="blue-grey" class="white--text">新增</v-btn>
       </v-col>
     </v-row>
 
     <v-card>
       <v-card-title>
-        
         <v-row justify="space-between" class="mb-1">
-          
           <!-- 現金餘額 -->
           <v-col>
             <!-- <v-icon left>mdi-currency-usd</v-icon> -->
@@ -90,16 +92,13 @@
             {{ numFormat(getTotal(rowsMonth)) }}
           </v-col>
         </v-row>
-       
       </v-card-title>
       <v-card-text>
-       
         <v-row>
           <!-- 日期 -->
           <!-- <v-col>{{ new Date(today).toISOString().slice(5, 10)}}</v-col> -->
-          
         </v-row>
-       
+
         <!-- 表格 -->
         <v-data-table
           :items-per-page="100"
@@ -111,8 +110,8 @@
           :search="search"
           @click:row="editItem"
         >
-          <template v-slot:header.note="{  }"> {{ new Date(today).toISOString().slice(5, 10) }}</template>
-          <template v-slot:header.expense="{  }"> {{ numFormat(getTotal(rows)) }}</template>
+          <template v-slot:header.note="{  }">{{ new Date(today).toISOString().slice(5, 10) }}</template>
+          <template v-slot:header.expense="{  }">{{ numFormat(getTotal(rows)) }}</template>
 
           <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(0,10) }}</template>
           <template v-slot:item.actions="{ item }">
@@ -160,9 +159,11 @@ export default {
 
   watch: {
     // whenever question changes, this function will run
+    // 新增刪除資料後,立即更新餘額和月合計
     rows() {
       // if (newQuestion.indexOf('?') > -1) {
       this.getBalance();
+
       // }
     }
   },
@@ -223,18 +224,25 @@ export default {
   methods: {
     // 帳戶餘額
     async getBalance() {
+      try {
+        const expenses = collection(db, "expenses");
+        let q = query(expenses, where("account_name", "==", "現金"));
+        const docSnapBig = await getDocs(q);
+        let income = 0;
+        let expense = 0;
+        docSnapBig.forEach(doc => {
+          if (doc.data().income) income += doc.data().income * 1;
+          if (doc.data().expense) expense += doc.data().expense * 1;
+          // accountData.push({ ...doc.data() });
+        });
+        this.balance = income - expense;
+      } catch (e) {
+        this.loading = false;
+        console.log("Error getting document:", e);
+      }
+
       // let accountData = [];
-      const expenses = collection(db, "expenses");
-      let q = query(expenses, where("account_name", "==", "現金"));
-      const docSnapBig = await getDocs(q);
-      let income = 0;
-      let expense = 0;
-      docSnapBig.forEach(doc => {
-        if (doc.data().income) income += doc.data().income * 1;
-        if (doc.data().expense) expense += doc.data().expense * 1;
-        // accountData.push({ ...doc.data() });
-      });
-      this.balance = income - expense;
+
       // let income = 0 ;
       // let expense = 0 ;
       // console.log(income)
