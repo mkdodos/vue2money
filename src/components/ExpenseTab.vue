@@ -4,15 +4,15 @@
     <v-dialog v-model="dialog" width="500">
       <v-card>
         <v-card-title class="text-h5 lighten-2">
-         <v-row justify="space-between">
-          <v-col cols="4"> 編輯</v-col>
-          <!-- <v-col></v-col> -->
-          <v-col cols="2"> <v-btn icon @click="dialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn></v-col>
-         </v-row>
-         
-          
+          <v-row justify="space-between">
+            <v-col cols="4">編輯</v-col>
+            <!-- <v-col></v-col> -->
+            <v-col cols="2">
+              <v-btn icon @click="dialog = false">
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
         </v-card-title>
         <v-card-text>
           <v-container>
@@ -92,7 +92,9 @@
         <v-select :items="months" v-model="search.m"></v-select>
         <!-- <v-text-field type="number" v-model="search.m" label="月"></v-text-field> -->
       </v-col>
-      <v-col></v-col>
+      <v-col>
+        <v-select :items="types" v-model="search.trans_type" label="類型"></v-select>
+      </v-col>
     </v-row>
     <v-row>
       <v-col>
@@ -532,9 +534,13 @@ export default {
       docSnapBig.forEach(doc => {
         this.rows.push({ ...doc.data(), id: doc.id });
       });
-
-      this.rows = this.rows.filter(row => row.trans_type != "轉帳");
-      this.rows = this.rows.filter(row => row.trans_type != "投資");
+      // 類型選一般或沒選都做篩選(因為新增資料時,可能沒選類型,就視為一般)
+      if (this.search.trans_type=='一般' || !this.search.trans_type) {
+        this.rows = this.rows.filter(row => row.trans_type != "轉帳");
+        this.rows = this.rows.filter(row => row.trans_type != "投資");
+      }else{
+        this.rows = this.rows.filter(row => row.trans_type == this.search.trans_type);
+      }
       this.loading = false;
     }
   }
