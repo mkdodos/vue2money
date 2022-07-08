@@ -123,7 +123,8 @@
         <v-text-field v-model="search.keyword" append-icon="mdi-magnify"></v-text-field>
       </v-col>
       <v-col>
-        <v-btn @click="switchCols">切換欄位</v-btn>
+        <!-- <v-btn @click="switchCols">切換欄位</v-btn> -->
+        <v-btn @click="switchInOut">收支切換</v-btn>
       </v-col>
     </v-row>
 
@@ -140,7 +141,12 @@
         <v-btn @click="openDialog" color="blue-grey" class="white--text">新增</v-btn>
       </v-col>
       <v-col cols="4">
-        <v-btn outlined color="blue" dark>{{ getTotal(rows) }}</v-btn>
+        <v-btn outlined :color="totalColor" dark>
+         <span v-if="isExpense">-</span>
+    <span  v-else>+</span>
+
+          {{ getTotal(rows) }}
+          </v-btn>
       </v-col>
 
       <!-- <v-col>
@@ -162,6 +168,9 @@
       :sort-desc.sync="sortDesc"
     >
       <template v-slot:item.spend_date="{ item }">{{ item.spend_date.slice(5,10) }}</template>
+      <!-- 項目如果是空白就顯示類別 -->
+      <template v-slot:item.note="{ item }">{{getNoteCate(item)}}</template>
+      <template v-slot:item.amt="{ item }">{{getAmt(item)}}</template>
     </v-data-table>
     <!-- </v-col> -->
     <!-- </v-row> -->
@@ -196,8 +205,15 @@ export default {
       default: "expenses"
     }
   },
+  computed: {
+     totalColor: function() {
+      return (this.isExpense)?'red':'blue'
+    },
+  },
   data() {
     return {
+      // 作為顯示收入或支出條件判斷
+      isExpense: true,
       types: ["一般", "轉帳", "投資"],
       incomeOrExpense: "expense",
       sortBy: "spend_date",
@@ -226,7 +242,7 @@ export default {
 
         { text: "項目", value: "note", width: "120" },
 
-        { text: "支出", value: "expense", width: "70" }
+        { text: "金額", value: "amt", width: "70" }
       ],
       loading: false,
       switchColsFlag: false
@@ -241,6 +257,18 @@ export default {
     this.getCates();
   },
   methods: {
+    switchInOut() {
+      this.isExpense = !this.isExpense;
+      this.getDataYM();
+    },
+    getAmt(item) {
+      if (this.isExpense) return item.expense;
+      return item.income;
+    },
+    getNoteCate(item) {
+      if (item.note) return item.note;
+      return "[ " + item.cate_name + " ]";
+    },
     // 切換欄位顯示
     switchCols() {
       let account = { text: "帳戶", value: "account_name", width: "60" };
@@ -304,11 +332,21 @@ export default {
 
     // 支出合計
     getTotal(arr) {
-      let total = Object.keys(arr).reduce(function(previous, key) {
-        // expense 有可能為空
-        if (arr[key].expense) return previous + arr[key].expense * 1;
-        else return previous + 0;
-      }, 0);
+      let total = 0;
+      // 收支
+      if (this.isExpense) {
+        total = Object.keys(arr).reduce(function(previous, key) {
+          // expense 有可能為空
+          if (arr[key].expense) return previous + arr[key].expense * 1;
+          else return previous + 0;
+        }, 0);
+      } else {
+        total = Object.keys(arr).reduce(function(previous, key) {
+          // income 有可能為空
+          if (arr[key].income) return previous + arr[key].income * 1;
+          else return previous + 0;
+        }, 0);
+      }
 
       // Create our number formatter.
       var formatter = new Intl.NumberFormat("en-US", {
@@ -535,12 +573,24 @@ export default {
         this.rows.push({ ...doc.data(), id: doc.id });
       });
       // 類型選一般或沒選都做篩選(因為新增資料時,可能沒選類型,就視為一般)
-      if (this.search.trans_type=='一般' || !this.search.trans_type) {
+      if (this.search.trans_type == "一般" || !this.search.trans_type) {
         this.rows = this.rows.filter(row => row.trans_type != "轉帳");
         this.rows = this.rows.filter(row => row.trans_type != "投資");
-      }else{
-        this.rows = this.rows.filter(row => row.trans_type == this.search.trans_type);
+      } else {
+        this.rows = this.rows.filter(
+          row => row.trans_type == this.search.trans_type
+        );
       }
+
+      // 收支切換
+      if (this.isExpense) {
+        this.rows = this.rows.filter(row => row.expense != "");
+      } else {
+        this.rows = this.rows.filter(
+          row => row.income != undefined && row.income != ""
+        );
+      }
+
       this.loading = false;
     }
   }
